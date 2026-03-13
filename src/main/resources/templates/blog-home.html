@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>All Posts</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css"
+        rel="stylesheet"
+        integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB"
+        crossorigin="anonymous">
+</head>
+<body>
+<div class="container">
+  <div class="row">
+    <h1>Posts that you can Enjoy!</h1>
+  </div>
+  <table class="table table-striped table-hover table-bordered">
+    <thead class="table-primary">
+    <th style="width:10%">Id</th>
+    <th style="width:20%">Title</th>
+    <th style="width:10%">Excerpt</th>
+    <th style="width:10%">Author</th>
+    <th style="width:10%">Published Date</th>
+    <th style="width:10%">Tags</th>
+    </thead>
+    <tbody>
+    <tr th:each="post : ${posts}">
+
+      <td th:text="${post.id}">1</td>
+
+      <td>
+        <a th:href="@{/posts/{id}(id=${post.id})}"
+           th:text="${post.title}"
+           class="text-decoration-none fw-bold">Post Title</a>
+      </td>
+
+      <td th:text="${post.excerpt}">Post excerpt goes here...</td>
+
+      <td>Admin</td>
+
+      <td th:text="${post.published_at != null ? #temporals.format(post.published_at, 'MMM dd, yyyy') : 'No Date'}">Date</td>
+
+      <td>
+                <span th:each="postTag : ${post.postTags}"
+                      th:text="${postTag.tag.name}"
+                      class="badge bg-secondary me-1">
+                </span>
+      </td>
+
+    </tr>
+    </tbody>
+  </table>
+</div>
+</body>
+</html>
+
+
+

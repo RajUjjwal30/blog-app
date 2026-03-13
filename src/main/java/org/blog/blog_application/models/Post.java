@@ -6,6 +6,8 @@ import jakarta.persistence.OneToMany;
 import lombok.Getter;
 import lombok.Setter;
 import java.time.LocalDate;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @Getter
@@ -20,6 +22,8 @@ public class Post extends BaseModel{
     private String author;
     private LocalDate published_at;
     private boolean is_published;
+    @OneToMany(mappedBy = "post")
+    private Set<PostTag> postTags = new HashSet<>();
 
 
 }
