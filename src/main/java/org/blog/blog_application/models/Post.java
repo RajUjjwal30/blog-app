@@ -2,15 +2,16 @@ package org.blog.blog_application.models;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.Lob;
+import jakarta.persistence.OneToMany;
 import lombok.Getter;
 import lombok.Setter;
 import java.time.LocalDate;
+import java.util.Set;
 
 @Getter
 @Setter
-@Entity
-public class Posts extends BaseModel{
+@Entity(name = "posts")
+public class Post extends BaseModel{
     @Column(nullable = false)
     private String title;
     private String excerpt;
@@ -19,5 +20,6 @@ public class Posts extends BaseModel{
     private String author;
     private LocalDate published_at;
     private boolean is_published;
+
 
 }
