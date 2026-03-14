@@ -19,4 +19,5 @@ public class PostController {
         model.addAttribute("posts", postService.getAllPosts());
         return "blog-home";
     }
+
 }

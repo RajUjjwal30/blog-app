@@ -4,6 +4,7 @@ import org.blog.blog_application.models.Post;
 import org.blog.blog_application.repositories.PostRepository;
 import org.springframework.stereotype.Service;
 import java.util.List;
+import java.util.Optional;
 
 @Service("PostServiceImplBasic")
 public class PostServiceImpl implements PostService{
@@ -17,4 +18,6 @@ public class PostServiceImpl implements PostService{
     public List<Post> getAllPosts() {
         return postRepository.findAll();
     }
+
+
 }
