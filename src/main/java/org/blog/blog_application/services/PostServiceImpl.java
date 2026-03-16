@@ -9,6 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 @Service("PostServiceImplBasic")
@@ -51,6 +52,12 @@ public class PostServiceImpl implements PostService{
             post.getPostTags().add(postTagConnector);
         }
         postRepository.save(post);
+    }
+
+    @Override
+    public Post getSinglePost(Long postId) {
+        Optional<Post> optionalPost = postRepository.findById(postId);
+        return optionalPost.get();
     }
 
 

@@ -7,9 +7,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.HashSet;
-import java.util.Set;
-
 @Controller
 @RequestMapping("/blog")
 public class PostController {
@@ -36,5 +33,11 @@ public class PostController {
         System.out.println("######## AUTHOR FROM FORM ######## " + post.getAuthor());
         postService.createPostWithTags(post, customTags);
         return "redirect:/blog/posts";
+    }
+    @GetMapping("/posts/{postId}")
+    public String viewPost(@PathVariable("postId") Long postId, Model model){
+        Post post = postService.getSinglePost(postId);
+        model.addAttribute("post", post);
+        return "post-view";
     }
 }

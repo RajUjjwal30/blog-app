@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Post</title>
+</head>
+
+<body>
+
+<h1 th:text="${post.title}"></h1>
+
+<p>
+    Author:
+    <span th:text="${post.author}"></span>
+</p>
+
+<p>
+    Published:
+    <span th:text="${post.publishedAt}"></span>
+</p>
+
+<h3>Tags</h3>
+
+<ul>
+    <li th:each="pt : ${post.postTags}"
+        th:text="${pt.tag.name}">
+    </li>
+</ul>
+
+<hr>
+
+<div th:text="${post.content}"></div>
+
+</body>
+</html>

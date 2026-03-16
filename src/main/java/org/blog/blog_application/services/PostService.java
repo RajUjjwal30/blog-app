@@ -8,4 +8,6 @@ public interface PostService {
     List<Post> getAllPosts();
 
     void createPostWithTags(Post post, String customTags);
+
+    Post getSinglePost(Long postId);
 }
