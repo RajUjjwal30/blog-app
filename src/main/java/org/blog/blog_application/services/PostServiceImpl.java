@@ -105,7 +105,13 @@ public class PostServiceImpl implements PostService{
         }
     }
 
-
+    @Override
+    @Transactional
+    public void deletePost(Long postId) {
+        Post post = postRepository.findById(postId)
+                .orElseThrow(() -> new RuntimeException("Post not found"));
+        postRepository.deleteById(postId);
+    }
 
 
 }

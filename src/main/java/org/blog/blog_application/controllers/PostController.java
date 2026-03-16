@@ -58,6 +58,10 @@ public class PostController {
 
         return "redirect:/blog/posts/" + postId;
     }
-
+    @PostMapping("/posts/delete/{postId}")
+    public String deletePost(@PathVariable Long postId) {
+        postService.deletePost(postId);
+        return "redirect:/blog/posts";
+    }
 
 }
