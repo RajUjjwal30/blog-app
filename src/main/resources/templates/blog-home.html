@@ -33,9 +33,9 @@
 
       <td th:text="${post.excerpt}">Post excerpt goes here...</td>
 
-      <td>Admin</td>
+      <td th:text="${post.author}">Author</td>
 
-      <td th:text="${post.published_at != null ? #temporals.format(post.published_at, 'MMM dd, yyyy') : 'No Date'}">Date</td>
+      <td th:text="${post.publishedAt != null ? #temporals.format(post.publishedAt, 'MMM dd, yyyy') : 'No Date'}">Date</td>
 
       <td>
                 <span th:each="postTag : ${post.postTags}"

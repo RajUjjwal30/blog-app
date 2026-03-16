@@ -11,9 +11,9 @@ import lombok.Setter;
 @Entity(name = "post_tags")
 public class PostTag extends BaseModel{
     @ManyToOne
-    @JoinColumn(name = "(foreign_key)post_id")
+    @JoinColumn(name = "post_id")
     private Post post;
     @ManyToOne
-    @JoinColumn(name = "(foreign_key)tag_id")
+    @JoinColumn(name = "tag_id")
     private Tag tag;
 }

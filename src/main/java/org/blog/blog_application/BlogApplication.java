@@ -18,45 +18,44 @@ public class BlogApplication {
     }
 
 
-    @Bean
-    public CommandLineRunner loadDummyData(PostRepository postRepository, TagRepository tagRepository) {
-        return args -> {
-            if (postRepository.count() == 0) {
-                System.out.println("Database is empty. Loading dummy data...");
+//    @Bean
+//    public CommandLineRunner loadDummyData(PostRepository postRepository, TagRepository tagRepository) {
+//        return args -> {
+//            if (postRepository.count() == 0) {
+//
+//                Tag javaTag = new Tag();
+//                javaTag.setName("Java");
+//                tagRepository.save(javaTag);
+//
+//                // POST 1
+//                Post post = new Post();
+//                post.setTitle("My First Spring Boot Blog");
+//                post.setContent("First blog.......");
+//                post.setExcerpt("Learning how to build a blog...");
+//
+//                PostTag pt = new PostTag();
+//                pt.setPost(post);
+//                pt.setTag(javaTag);
+//
+//                post.getPostTags().add(pt);
+//
+//                // POST 2
+//                Post post2 = new Post();
+//                post2.setTitle("My Second Spring Boot Blog");
+//                post2.setContent("Second blog.......");
+//                post2.setExcerpt("Learning more about Spring Boot...");
+//
+//                PostTag pt2 = new PostTag();
+//                pt2.setPost(post2);
+//                pt2.setTag(javaTag);
+//
+//                post2.getPostTags().add(pt2);
+//
+//                postRepository.save(post);
+//                postRepository.save(post2);
+//            }
+//        };
+//    }
 
-                // Create tags
-                Tag javaTag = new Tag();
-                javaTag.setName("Java");
-                tagRepository.save(javaTag);
-
-                // Create post
-                Post post = new Post();
-                post.setTitle("My First Spring Boot Blog");
-                post.setContent("First blog.......");
-                post.setExcerpt("Learning how to build a blog...");
-
-                // Link them
-                PostTag pt = new PostTag();
-                pt.setPost(post);
-                pt.setTag(javaTag);
-                post.getPostTags().add(pt);
-
-
-                Post post2 = new Post();
-                post2.setTitle("My First Spring Boot Blog");
-                post2.setContent("First blog.......");
-                post2.setExcerpt("Learning how to build a blog...");
-
-                // Link them
-                PostTag pt2 = new PostTag();
-                pt2.setPost(post);
-                pt2.setTag(javaTag);
-                post2.getPostTags().add(pt);
-
-                postRepository.save(post);
-                postRepository.save(post2);
-                System.out.println("Dummy data loaded successfully!");
-            }
-        };
-    }
 }
+

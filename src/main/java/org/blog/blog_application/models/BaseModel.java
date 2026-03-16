@@ -13,6 +13,6 @@ public abstract class BaseModel {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id(pk)")
     private Long id;
-    private LocalDate created_at;
-    private LocalDate updated_at;
+    private LocalDate createdAt;
+    private LocalDate updatedAt;
 }

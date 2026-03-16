@@ -7,5 +7,5 @@ import java.util.List;
 public interface PostService {
     List<Post> getAllPosts();
 
-
+    void createPostWithTags(Post post, String customTags);
 }
