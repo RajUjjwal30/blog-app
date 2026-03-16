@@ -1,5 +1,6 @@
 package org.blog.blog_application.services;
 
+import org.blog.blog_application.dtos.UpdatePostDto;
 import org.blog.blog_application.models.Post;
 
 import java.util.List;
@@ -10,4 +11,7 @@ public interface PostService {
     void createPostWithTags(Post post, String customTags);
 
     Post getSinglePost(Long postId);
+
+    UpdatePostDto getPostForUpdate(Long postId);
+    void updatePost(Long postId, UpdatePostDto dto);
 }

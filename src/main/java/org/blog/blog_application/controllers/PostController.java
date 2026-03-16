@@ -1,5 +1,6 @@
 package org.blog.blog_application.controllers;
 
+import org.blog.blog_application.dtos.UpdatePostDto;
 import org.blog.blog_application.models.Post;
 import org.blog.blog_application.services.PostService;
 import org.blog.blog_application.services.TagService;
@@ -30,7 +31,6 @@ public class PostController {
     }
     @PostMapping("/posts")
     public String createPost(@ModelAttribute Post post, @RequestParam(value = "customTags",required = false) String customTags){
-        System.out.println("######## AUTHOR FROM FORM ######## " + post.getAuthor());
         postService.createPostWithTags(post, customTags);
         return "redirect:/blog/posts";
     }
@@ -40,4 +40,24 @@ public class PostController {
         model.addAttribute("post", post);
         return "post-view";
     }
+    @GetMapping("/posts/update/{postId}")
+    public String editForm(@PathVariable Long postId, Model model) {
+
+        UpdatePostDto dto = postService.getPostForUpdate(postId);
+
+        model.addAttribute("post", dto);
+        model.addAttribute("allTags", tagService.getAllTags());
+
+        return "edit-post";
+    }
+    @PostMapping("/posts/update/{postId}")
+    public String updatePost(@PathVariable Long postId,
+                             @ModelAttribute UpdatePostDto dto) {
+
+        postService.updatePost(postId, dto);
+
+        return "redirect:/blog/posts/" + postId;
+    }
+
+
 }

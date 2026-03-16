@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<div th:replace="fragments/header :: header"></div>
+
+<body>
+
+<div th:replace="fragments/header :: navbar"></div>
+
+<div class="container">
+  <div class="row col-md-8 offset-md-2">
+
+    <div class="card">
+
+      <div class="card-header">
+        <h2 class="text-center">Edit Post</h2>
+      </div>
+
+      <div class="card-body">
+
+        <form role="form"
+              method="post"
+              th:action="@{/blog/posts/update/{id}(id=${post.id})}"
+              th:object="${post}">
+
+          <div class="mb-3">
+            <label class="form-label">Title</label>
+
+            <input
+                    type="text"
+                    class="form-control"
+                    placeholder="Enter post title"
+                    th:field="*{title}">
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">Content</label>
+
+            <textarea
+                    class="form-control"
+                    placeholder="Write a beautiful thought...!"
+                    rows="12"
+                    th:field="*{content}">
+                        </textarea>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">Author</label>
+
+            <input
+                    type="text"
+                    class="form-control"
+                    placeholder="Author name"
+                    th:field="*{author}">
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">Published DateTime</label>
+
+            <input
+                    type="datetime-local"
+                    class="form-control"
+                    th:field="*{publishedAt}">
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">Tags</label>
+
+            <input
+                    type="text"
+                    class="form-control"
+                    name="customTags"
+                    th:value="${post.tags}">
+          </div>
+
+          <button type="submit" class="btn btn-primary">
+            Update Post
+          </button>
+
+        </form>
+
+      </div>
+
+    </div>
+
+  </div>
+</div>
+
+</body>
+</html>

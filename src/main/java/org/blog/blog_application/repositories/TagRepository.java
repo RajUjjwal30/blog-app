@@ -12,5 +12,6 @@ public interface TagRepository extends JpaRepository<Tag, Long> {
     List<Tag> findAll();
 
     Optional<Tag> findByNameIgnoreCase(String tagName);
-    //Optional<Tag> findById(Long id);
+
+    Optional<Tag> findById(Long tagId);
 }

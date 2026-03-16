@@ -1,36 +1,56 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
-
+<div th:replace="fragments/header ::header">
+</div>
+<div th:replace="fragments/header ::navbar">
+</div>
 <head>
-    <meta charset="UTF-8">
-    <title>Post</title>
+    <body>
+    <div class="container">
+        <h1 th:text="${post.title}"></h1>
+        <div style="margin-bottom:15px">
+
+            <a th:href="@{/blog/posts/update/{id}(id=${post.id})}">
+                Edit Post
+            </a>
+
+            <form th:action="@{/blog/posts/delete/{id}(id=${post.id})}"
+                  method="post"
+                  style="display:inline;">
+                <button type="submit">
+                    Delete Post
+                </button>
+            </form>
+
+        </div>
+
+        <p>
+            <strong>Author:</strong>
+            <span th:text="${post.author}"></span>
+        </p>
+
+        <p>
+            <strong>Published:</strong>
+            <span th:text="${post.publishedAt}"></span>
+        </p>
+
+        <h3>Tags</h3>
+
+        <ul>
+            <li th:each="pt : ${post.postTags}"
+                th:text="${pt.tag.name}">
+            </li>
+        </ul>
+
+        <hr>
+
+        <div th:text="${post.content}"></div>
+    </div>
+
+    </body>
+    </html>
+
 </head>
-
-<body>
-
-<h1 th:text="${post.title}"></h1>
-
-<p>
-    Author:
-    <span th:text="${post.author}"></span>
-</p>
-
-<p>
-    Published:
-    <span th:text="${post.publishedAt}"></span>
-</p>
-
-<h3>Tags</h3>
-
-<ul>
-    <li th:each="pt : ${post.postTags}"
-        th:text="${pt.tag.name}">
-    </li>
-</ul>
-
-<hr>
-
-<div th:text="${post.content}"></div>
 
 </body>
 </html>

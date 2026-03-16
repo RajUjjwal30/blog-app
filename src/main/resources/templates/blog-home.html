@@ -21,10 +21,11 @@
     <p>
       <strong th:text="${post.author}"></strong>
       |
-      <span th:text="${post.publishedAt}"></span>
+      <span th:text="${#temporals.format(post.publishedAt, 'dd MMM yyyy')}"></span>
     </p>
 
     <div>
+      <strong>Tags:</strong>
             <span th:each="pt : ${post.postTags}"
                   class="badge bg-secondary me-1"
                   th:text="${pt.tag.name}">
