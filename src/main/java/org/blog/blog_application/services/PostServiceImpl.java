@@ -7,6 +7,8 @@ import org.blog.blog_application.models.PostTag;
 import org.blog.blog_application.models.Tag;
 import org.blog.blog_application.repositories.PostRepository;
 import org.blog.blog_application.repositories.TagRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -32,6 +34,7 @@ public class PostServiceImpl implements PostService{
 
     @Override
     public List<Post> getAllPosts() {
+
         return postRepository.findAll();
     }
 
@@ -111,6 +114,12 @@ public class PostServiceImpl implements PostService{
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new RuntimeException("Post not found"));
         postRepository.deleteById(postId);
+    }
+
+    @Override
+    public Page<Post> getPostPagination(int pageNumber, int pageSize) {
+        PageRequest pageRequest = PageRequest.of(pageNumber, pageSize);
+        return postRepository.findAll(pageRequest);
     }
 
 

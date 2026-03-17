@@ -1,21 +1,38 @@
-<!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<footer th:fragment="pagination">
 
-<body>
-<footer th:fragment="footer">
-    <nav aria-label="Page navigation example">
+    <nav>
         <ul class="pagination justify-content-center">
-            <li class="page-item disabled">
-                <a class="page-link">Previous</a>
+
+            <!-- Previous -->
+            <li class="page-item"
+                th:classappend="${currentPage == 1} ? 'disabled'">
+                <a class="page-link"
+                   th:href="@{/blog/posts(pageNumber=${currentPage - 1}, pageSize=${pageSize})}">
+                    Previous
+                </a>
             </li>
-            <li class="page-item"><a class="page-link" href="#">1</a></li>
-            <li class="page-item"><a class="page-link" href="#">2</a></li>
-            <li class="page-item"><a class="page-link" href="#">3</a></li>
-            <li class="page-item">
-                <a class="page-link" href="#">Next</a>
+
+            <!-- Page Numbers -->
+            <li class="page-item"
+                th:each="i : ${#numbers.sequence(1, totalPages)}"
+                th:classappend="${i == currentPage} ? 'active'">
+
+                <a class="page-link"
+                   th:href="@{/blog/posts(pageNumber=${i}, pageSize=${pageSize})}"
+                   th:text="${i}">
+                </a>
             </li>
+
+            <!-- Next -->
+            <li class="page-item"
+                th:classappend="${currentPage == totalPages} ? 'disabled'">
+                <a class="page-link"
+                   th:href="@{/blog/posts(pageNumber=${currentPage + 1}, pageSize=${pageSize})}">
+                    Next
+                </a>
+            </li>
+
         </ul>
     </nav>
+
 </footer>
-</body>
-</html>

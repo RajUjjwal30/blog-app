@@ -6,6 +6,7 @@ import org.blog.blog_application.models.Post;
 import org.blog.blog_application.services.CommentService;
 import org.blog.blog_application.services.PostService;
 import org.blog.blog_application.services.TagService;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -24,8 +25,14 @@ public class PostController {
         this.commentService=commentService;
     }
     @GetMapping("/posts")
-    public String getAllPosts(Model model){
-        model.addAttribute("posts", postService.getAllPosts());
+    public String getAllPosts(@RequestParam(defaultValue = "1")int pageNumber,
+                              @RequestParam(defaultValue="5")int pageSize,Model model){
+        int pageIndex = pageNumber - 1;
+        Page<Post> postPage = postService.getPostPagination(pageIndex, 5);
+        model.addAttribute("posts", postPage.getContent());
+        model.addAttribute("currentPage", pageNumber);
+        model.addAttribute("totalPages", postPage.getTotalPages());
+        //model.addAttribute("posts", postService.getAllPosts());
         return "blog-home";
     }
     @GetMapping("/posts/create")
