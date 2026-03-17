@@ -25,12 +25,13 @@ public class PostController {
         this.commentService=commentService;
     }
     @GetMapping("/posts")
-    public String getAllPosts(@RequestParam(defaultValue = "1")int pageNumber,
-                              @RequestParam(defaultValue="5")int pageSize,Model model){
-        int pageIndex = pageNumber - 1;
-        Page<Post> postPage = postService.getPostPagination(pageIndex, 5);
+    public String getAllPosts(@RequestParam(defaultValue = "1")int start,
+                              @RequestParam(defaultValue="10")int limit,Model model){
+        int pageIndex = (start-1) / limit;
+        Page<Post> postPage = postService.getPostPagination(pageIndex, limit);
         model.addAttribute("posts", postPage.getContent());
-        model.addAttribute("currentPage", pageNumber);
+        model.addAttribute("start", start);
+        model.addAttribute("limit", limit);
         model.addAttribute("totalPages", postPage.getTotalPages());
         //model.addAttribute("posts", postService.getAllPosts());
         return "blog-home";

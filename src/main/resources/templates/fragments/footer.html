@@ -5,9 +5,12 @@
 
             <!-- Previous -->
             <li class="page-item"
-                th:classappend="${currentPage == 1} ? 'disabled'">
+                th:classappend="${start <= 1} ? 'disabled'">
                 <a class="page-link"
-                   th:href="@{/blog/posts(pageNumber=${currentPage - 1}, pageSize=${pageSize})}">
+                   th:href="@{/blog/posts(
+                        start=${start - limit > 0 ? start - limit : 1},
+                        limit=${limit}
+                   )}">
                     Previous
                 </a>
             </li>
@@ -15,19 +18,25 @@
             <!-- Page Numbers -->
             <li class="page-item"
                 th:each="i : ${#numbers.sequence(1, totalPages)}"
-                th:classappend="${i == currentPage} ? 'active'">
+                th:classappend="${((i - 1) * limit + 1) == start} ? 'active'">
 
                 <a class="page-link"
-                   th:href="@{/blog/posts(pageNumber=${i}, pageSize=${pageSize})}"
+                   th:href="@{/blog/posts(
+                        start=${(i - 1) * limit + 1},
+                        limit=${limit}
+                   )}"
                    th:text="${i}">
                 </a>
             </li>
 
             <!-- Next -->
             <li class="page-item"
-                th:classappend="${currentPage == totalPages} ? 'disabled'">
+                th:classappend="${start + limit > totalPages * limit} ? 'disabled'">
                 <a class="page-link"
-                   th:href="@{/blog/posts(pageNumber=${currentPage + 1}, pageSize=${pageSize})}">
+                   th:href="@{/blog/posts(
+                        start=${start + limit},
+                        limit=${limit}
+                   )}">
                     Next
                 </a>
             </li>
