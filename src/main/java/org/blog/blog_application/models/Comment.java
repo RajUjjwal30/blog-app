@@ -4,8 +4,8 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import lombok.Getter;
-import lombok.Setter;
+import jdk.jshell.Snippet;
+import lombok.*;
 
 @Getter
 @Setter
@@ -13,8 +13,10 @@ import lombok.Setter;
 public class Comment extends BaseModel{
     private String name;
     private String email;
-    private String comment;
+    private String content;
     @ManyToOne
-    @JoinColumn(name = "(foreign_key)post_id")
+    @JoinColumn(name = "post_id")
     private Post post;
+
+
 }

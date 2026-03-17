@@ -1,7 +1,9 @@
 package org.blog.blog_application.controllers;
 
+import org.blog.blog_application.dtos.CommentDto;
 import org.blog.blog_application.dtos.UpdatePostDto;
 import org.blog.blog_application.models.Post;
+import org.blog.blog_application.services.CommentService;
 import org.blog.blog_application.services.PostService;
 import org.blog.blog_application.services.TagService;
 import org.springframework.stereotype.Controller;
@@ -13,11 +15,13 @@ import org.springframework.web.bind.annotation.*;
 public class PostController {
     private PostService postService;
     private TagService tagService;
+    private CommentService commentService;
 
-    public PostController(PostService postService, TagService tagService) {
+    public PostController(PostService postService, TagService tagService, CommentService commentService) {
 
         this.postService = postService;
         this.tagService = tagService;
+        this.commentService=commentService;
     }
     @GetMapping("/posts")
     public String getAllPosts(Model model){
@@ -38,6 +42,8 @@ public class PostController {
     public String viewPost(@PathVariable("postId") Long postId, Model model){
         Post post = postService.getSinglePost(postId);
         model.addAttribute("post", post);
+        model.addAttribute("commentDto", new CommentDto());
+        model.addAttribute("comments", commentService.getCommentsByPostId(postId));
         return "post-view";
     }
     @GetMapping("/posts/update/{postId}")
