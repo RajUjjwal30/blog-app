@@ -5,6 +5,7 @@ import org.blog.blog_application.models.Post;
 import org.springframework.core.annotation.MergedAnnotations;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 
 import java.util.List;
 
@@ -20,6 +21,8 @@ public interface PostService {
 
     void deletePost(Long postId);
 
-    Page<Post> getPostPagination(int pageNumber, int pageSize, Sort sort);
+    Page<Post> getPostPagination(String search,int pageNumber, int pageSize, Sort sort);
 
+
+    //Page<Post> getPostPagination(String search, int pageNumber, int pageSize, Sort sort);
 }

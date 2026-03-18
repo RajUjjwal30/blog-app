@@ -29,20 +29,28 @@ public class PostController {
     @GetMapping("/posts")
     public String getAllPosts(@RequestParam(defaultValue = "1")int start,
                               @RequestParam(defaultValue="10")int limit,
+                              @RequestParam(required = false) String search,
                               @RequestParam(required = false,defaultValue = "publishedAt") String sortBy,
                               @RequestParam(required = false,defaultValue = "asc") String direction, Model model){
+
+        if (start < 1) start = 1;
+        if (limit <= 0) limit = 10;
+
         int pageIndex = (start-1) / limit;
 
         Sort sort = direction.equalsIgnoreCase("asc") ?
                 Sort.by(sortBy).ascending() :
                 Sort.by(sortBy).descending();
 
-        Page<Post> postPage = postService.getPostPagination(pageIndex, limit, sort);
+        Page<Post> postPage = postService.getPostPagination(search, pageIndex, limit, sort);
         model.addAttribute("posts", postPage.getContent());
         model.addAttribute("start", start);
         model.addAttribute("limit", limit);
         model.addAttribute("totalPages", postPage.getTotalPages());
         //model.addAttribute("posts", postService.getAllPosts());
+        model.addAttribute("search", search);
+        model.addAttribute("sortBy", sortBy);
+        model.addAttribute("direction", direction);
         return "blog-home";
     }
     @GetMapping("/posts/create")

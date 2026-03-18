@@ -36,9 +36,23 @@
 
             </ul>
 
-            <form class="d-flex" role="search">
-                <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search"/>
-                <button class="btn btn-outline-success" type="submit">Search</button>
+            <form th:action="@{/blog/posts}" method="get" class="d-flex">
+
+                <input type="text"
+                       name="search"
+                       class="form-control"
+                       placeholder="Search posts..."
+                       th:value="${search}" />
+
+                <input type="hidden" name="start" value="1"/>
+
+                <input type="hidden" name="limit" th:value="${limit}" />
+
+                <input type="hidden" name="sortBy" th:value="${sortBy}" />
+                <input type="hidden" name="direction" th:value="${direction}" />
+
+                <button type="submit" class="btn btn-success ms-2">Search</button>
+
             </form>
         </div>
     </div>

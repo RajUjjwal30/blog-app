@@ -7,9 +7,11 @@ import org.blog.blog_application.models.PostTag;
 import org.blog.blog_application.models.Tag;
 import org.blog.blog_application.repositories.PostRepository;
 import org.blog.blog_application.repositories.TagRepository;
+import org.blog.blog_application.specification.PostSpecification;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -117,10 +119,11 @@ public class PostServiceImpl implements PostService{
         postRepository.deleteById(postId);
     }
     @Override
-    public Page<Post> getPostPagination(int pageNumber, int pageSize, Sort sort) {
+    public Page<Post> getPostPagination(String search, int pageNumber, int pageSize, Sort sort) {
 //        Sort sort = Sort.by(Sort.Direction.ASC, "publishedAt");
-//        PageRequest pageRequest = PageRequest.of(pageNumber, pageSize,sort);
-        return postRepository.findAll(PageRequest.of(pageNumber, pageSize, sort));
+        Specification<Post> specification = PostSpecification.getSpecification(search);
+        PageRequest pageRequest = PageRequest.of(pageNumber, pageSize,sort);
+        return postRepository.findAll(specification,pageRequest);
     }
 
 
