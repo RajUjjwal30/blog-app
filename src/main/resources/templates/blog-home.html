@@ -6,6 +6,26 @@
 </div>
 
 <body>
+<form th:action="@{/blog/posts}" method="get">
+
+  <input type="hidden" name="page" value="1"/>
+
+  <!-- Sort By -->
+  <select name="sortBy">
+    <option value="publishedAt" th:selected="${sortBy == 'publishedAt'}">PublishedDateTime</option>
+<!--    <option value="title" th:selected="${sortBy == 'title'}">Title</option>-->
+<!--    <option value="author" th:selected="${sortBy == 'author'}">Author</option>-->
+  </select>
+
+  <!-- Direction -->
+  <select name="direction">
+    <option value="asc" th:selected="${direction == 'asc'}">Ascending</option>
+    <option value="desc" th:selected="${direction == 'desc'}">Descending</option>
+  </select>
+
+  <button type="submit">Sort</button>
+
+</form>
 <div class="container">
 
   <h1>Posts that you can Enjoy!</h1>

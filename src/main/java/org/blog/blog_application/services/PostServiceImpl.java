@@ -9,6 +9,7 @@ import org.blog.blog_application.repositories.PostRepository;
 import org.blog.blog_application.repositories.TagRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -117,9 +118,10 @@ public class PostServiceImpl implements PostService{
     }
 
     @Override
-    public Page<Post> getPostPagination(int pageNumber, int pageSize) {
-        PageRequest pageRequest = PageRequest.of(pageNumber, pageSize);
-        return postRepository.findAll(pageRequest);
+    public Page<Post> getPostPagination(int pageNumber, int pageSize, Sort sort) {
+//        Sort sort = Sort.by(Sort.Direction.ASC, "publishedAt");
+//        PageRequest pageRequest = PageRequest.of(pageNumber, pageSize,sort);
+        return postRepository.findAll(PageRequest.of(pageNumber, pageSize, sort));
     }
 
 
