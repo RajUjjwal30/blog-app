@@ -116,13 +116,13 @@ public class PostServiceImpl implements PostService{
                 .orElseThrow(() -> new RuntimeException("Post not found"));
         postRepository.deleteById(postId);
     }
-
     @Override
     public Page<Post> getPostPagination(int pageNumber, int pageSize, Sort sort) {
 //        Sort sort = Sort.by(Sort.Direction.ASC, "publishedAt");
 //        PageRequest pageRequest = PageRequest.of(pageNumber, pageSize,sort);
         return postRepository.findAll(PageRequest.of(pageNumber, pageSize, sort));
     }
+
 
 
 }

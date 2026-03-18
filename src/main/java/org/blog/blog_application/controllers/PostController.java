@@ -6,6 +6,7 @@ import org.blog.blog_application.models.Post;
 import org.blog.blog_application.services.CommentService;
 import org.blog.blog_application.services.PostService;
 import org.blog.blog_application.services.TagService;
+import org.springframework.core.annotation.MergedAnnotations;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Controller;
@@ -28,8 +29,8 @@ public class PostController {
     @GetMapping("/posts")
     public String getAllPosts(@RequestParam(defaultValue = "1")int start,
                               @RequestParam(defaultValue="10")int limit,
-                              @RequestParam(defaultValue = "publishedAt") String sortBy,
-                              @RequestParam(defaultValue = "asc") String direction,Model model){
+                              @RequestParam(required = false,defaultValue = "publishedAt") String sortBy,
+                              @RequestParam(required = false,defaultValue = "asc") String direction, Model model){
         int pageIndex = (start-1) / limit;
 
         Sort sort = direction.equalsIgnoreCase("asc") ?
