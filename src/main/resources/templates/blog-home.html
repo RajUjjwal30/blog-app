@@ -14,16 +14,16 @@
   <input type="hidden" name="search" th:value="${search != null ? search : ''}" />
 
   <!-- Sort By -->
-  <select name="sortBy">
-    <option value="publishedAt" th:selected="${sortBy != null and sortBy == 'publishedAt'}">PublishedDateTime</option>
+  <select name="sortField">
+    <option value="publishedAt" th:selected="${sortField != null and sortBy == 'publishedAt'}">PublishedDateTime</option>
 <!--    <option value="title" th:selected="${sortBy == 'title'}">Title</option>-->
 <!--    <option value="author" th:selected="${sortBy == 'author'}">Author</option>-->
   </select>
 
   <!-- Direction -->
   <select name="direction">
-    <option value="asc" th:selected="${direction == 'asc'}">Ascending</option>
-    <option value="desc" th:selected="${direction == 'desc'}">Descending</option>
+    <option value="asc" th:selected="${order == 'asc'}">Ascending</option>
+    <option value="desc" th:selected="${order == 'desc'}">Descending</option>
   </select>
 
   <button type="submit">Sort</button>

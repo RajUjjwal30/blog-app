@@ -2,6 +2,7 @@ package org.blog.blog_application.dtos;
 
 import lombok.Getter;
 import lombok.Setter;
+import org.blog.blog_application.models.User;
 
 import java.time.LocalDateTime;
 
@@ -12,7 +13,8 @@ public class PostUpdateDto {
         private String title;
         private String excerpt;
         private String content;
-        private String author;
+        private Long authorId;
+        private String authorName;
         private LocalDateTime publishedAt;
         private String tags;
 }

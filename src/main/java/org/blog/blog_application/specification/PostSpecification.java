@@ -18,22 +18,18 @@ public class PostSpecification {
                 String likePattern = "%" + search.toLowerCase() + "%";
 
                 List<Predicate> conditions = new ArrayList<>();
-                conditions.add(
-                        criteriaBuilder.like(criteriaBuilder.lower(root.get("title")), likePattern)
-                );
+                conditions.add(criteriaBuilder.like(criteriaBuilder.lower(root.get("title")), likePattern));
 
                 conditions.add(criteriaBuilder.like(criteriaBuilder.lower(root.get("content")), likePattern));
 
-                conditions.add(criteriaBuilder.like(criteriaBuilder.lower(root.get("author")), likePattern)
-                );
-                conditions.add(criteriaBuilder.like(criteriaBuilder.lower(root.get("excerpt")), likePattern)
-                );
+                Join<Object, Object> authorJoin = root.join("author", JoinType.LEFT);
+                conditions.add(criteriaBuilder.like(criteriaBuilder.lower(authorJoin.get("name")), likePattern));
 
-                Join<Object, Object> tagJoin = root.join("postTags").join("tag");
+                conditions.add(criteriaBuilder.like(criteriaBuilder.lower(root.get("excerpt")), likePattern));
 
-                conditions.add(
-                        criteriaBuilder.like(criteriaBuilder.lower(tagJoin.get("name")), likePattern)
-                );
+                Join<Object, Object> tagJoin = root.join("postTags", JoinType.LEFT).join("tag", JoinType.LEFT);
+
+                conditions.add(criteriaBuilder.like(criteriaBuilder.lower(tagJoin.get("name")), likePattern));
 
                 query.distinct(true);
 

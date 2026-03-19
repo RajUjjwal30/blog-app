@@ -17,7 +17,9 @@ public class Post extends BaseModel{
     private String excerpt;
     @Column(nullable = false,columnDefinition = "LONGTEXT")
     private String content;
-    private String author;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id")
+    private User author;
     private LocalDateTime publishedAt;
     private boolean isPublished;
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL)

@@ -6,7 +6,9 @@ import org.blog.blog_application.dtos.PostUpdateDto;
 import org.blog.blog_application.mapper.PostMapper;
 import org.blog.blog_application.models.Post;
 import org.blog.blog_application.models.PostTag;
+import org.blog.blog_application.models.User;
 import org.blog.blog_application.repositories.PostRepository;
+import org.blog.blog_application.repositories.UserRepository;
 import org.blog.blog_application.services.PostService;
 import org.blog.blog_application.services.TagService;
 import org.blog.blog_application.specification.PostSpecification;
@@ -23,10 +25,12 @@ public class PostServiceImpl implements PostService {
 
     private PostRepository postRepository;
     private TagService tagService;
+    private UserRepository userRepository;
 
-    public PostServiceImpl(PostRepository postRepository,TagService tagService) {
+    public PostServiceImpl(PostRepository postRepository,TagService tagService, UserRepository userRepository) {
         this.postRepository = postRepository;
         this.tagService = tagService;
+        this.userRepository=userRepository;
     }
 
     @Override
@@ -35,7 +39,13 @@ public class PostServiceImpl implements PostService {
         post.setTitle(dto.getTitle());
         post.setExcerpt(dto.getExcerpt());
         post.setContent(dto.getContent());
-        post.setAuthor(dto.getAuthor());
+        User author = userRepository.findByName(dto.getAuthorName())
+                .orElseGet(() -> {
+                    User newUser = new User();
+                    newUser.setName(dto.getAuthorName());
+                    return userRepository.save(newUser);
+                });
+        post.setAuthor(author);
         post.setPublishedAt(LocalDateTime.now());
 
         postRepository.save(post);
@@ -89,7 +99,8 @@ public class PostServiceImpl implements PostService {
         dto.setTitle(post.getTitle());
         dto.setExcerpt(post.getExcerpt());
         dto.setContent(post.getContent());
-        dto.setAuthor(post.getAuthor());
+        dto.setAuthorId(post.getAuthor().getId());
+        dto.setAuthorName(post.getAuthor().getName());
         dto.setPublishedAt(post.getPublishedAt());
 
         // tags → string
@@ -109,11 +120,12 @@ public class PostServiceImpl implements PostService {
 
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new RuntimeException("Post not found"));
-
+        User author = userRepository.findById(dto.getAuthorId())
+                .orElseThrow(() -> new RuntimeException("User not found"));
         post.setTitle(dto.getTitle());
         post.setExcerpt(dto.getExcerpt());
         post.setContent(dto.getContent());
-        post.setAuthor(dto.getAuthor());
+        post.setAuthor(author);
         tagService.updateTags(post, dto.getTags());
         //post.setPublishedAt(dto.getPublishedAt());
         postRepository.save(post);

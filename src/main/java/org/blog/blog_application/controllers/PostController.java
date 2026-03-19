@@ -29,7 +29,7 @@ public class PostController {
     public String getAllPosts(@RequestParam(defaultValue = "1")int start,
                               @RequestParam(defaultValue="10")int limit,
                               @RequestParam(required = false) String search,
-                              @RequestParam(required = false,defaultValue = "publishedAt") String sortBy,
+                              @RequestParam(required = false,defaultValue = "publishedAt") String sortField ,
                               @RequestParam(required = false,defaultValue = "asc") String direction, Model model){
 
         if (start < 1) start = 1;
@@ -38,8 +38,8 @@ public class PostController {
         int pageIndex = (start-1) / limit;
 
         Sort sort = direction.equalsIgnoreCase("asc") ?
-                Sort.by(sortBy).ascending() :
-                Sort.by(sortBy).descending();
+                Sort.by(sortField).ascending() :
+                Sort.by(sortField).descending();
 
         Page<PostResponseDto> postPage = postService.getPostPagination(search, pageIndex, limit, sort);
         model.addAttribute("posts", postPage.getContent());
@@ -48,7 +48,7 @@ public class PostController {
         model.addAttribute("totalPages", postPage.getTotalPages());
         //model.addAttribute("posts", postService.getAllPosts());
         model.addAttribute("search", search);
-        model.addAttribute("sortBy", sortBy);
+        model.addAttribute("sortBy", sortField);
         model.addAttribute("direction", direction);
         return "blog-home";
     }
@@ -60,6 +60,7 @@ public class PostController {
     @PostMapping("/posts")
     public String createPost(@ModelAttribute PostCreateDto dto){
         postService.createPost(dto);
+        System.out.println("qwertyuiop"+dto.getAuthorName());
         return "redirect:/blog/posts";
     }
     @GetMapping("/posts/{postId}")
