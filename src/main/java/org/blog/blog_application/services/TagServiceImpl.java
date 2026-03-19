@@ -1,18 +1,27 @@
 package org.blog.blog_application.services;
 
+import org.blog.blog_application.models.Post;
+import org.blog.blog_application.models.PostTag;
 import org.blog.blog_application.models.Tag;
+import org.blog.blog_application.repositories.PostRepository;
+import org.blog.blog_application.repositories.PostTagRepository;
 import org.blog.blog_application.repositories.TagRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Service("TagServiceBasic")
 public class TagServiceImpl implements TagService {
+    private final PostRepository postRepository;
     private TagRepository tagRepository;
+    private PostTagRepository postTagRepository;
 
-    public TagServiceImpl(TagRepository tagRepository) {
+    public TagServiceImpl(TagRepository tagRepository, PostRepository postRepository,
+                          PostTagRepository postTagRepository) {
         this.tagRepository = tagRepository;
+        this.postRepository = postRepository;
+        this.postTagRepository = postTagRepository;
     }
 
     @Override
@@ -30,6 +39,35 @@ public class TagServiceImpl implements TagService {
             newTag.setName(tagName);
             return tagRepository.save(newTag);
         }
+    }
+
+    @Override
+    public void attachTags(Post post, String tags) {
+
+        if (tags == null || tags.trim().isEmpty()) return;
+
+        String[] tagArray = tags.split(",");
+        Set<String> uniqueTags = new HashSet<>();
+        for (String tagName : tagArray) {
+            tagName = tagName.trim().toLowerCase();
+            if (tagName.isEmpty() || uniqueTags.contains(tagName)) continue;
+            uniqueTags.add(tagName);
+            Tag tag = getOrCreateTag(tagName);
+            PostTag postTag = new PostTag();
+            postTag.setPost(post);
+            postTag.setTag(tag);
+            post.getPostTags().add(postTag);
+        }
+        postRepository.save(post);
+    }
+
+    @Override
+    @Transactional
+    public void updateTags(Post post, String tags) {
+        post.setPostTags(new HashSet<>());
+        postTagRepository.deleteAllByPost(post);
+        postRepository.save(post);
+        attachTags(post, tags);
     }
 
 }

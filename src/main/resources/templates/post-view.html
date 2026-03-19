@@ -45,8 +45,8 @@
         <h3>Tags</h3>
 
         <ul>
-            <li th:each="pt : ${post.postTags}"
-                th:text="${pt.tag.name}">
+            <li th:each="tag : ${post.tags}"
+                th:text="${tag}">
             </li>
         </ul>
 

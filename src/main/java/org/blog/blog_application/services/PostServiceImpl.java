@@ -1,131 +1,127 @@
-package org.blog.blog_application.services;
+package org.blog.blog_application.services.impl;
 
-import org.blog.blog_application.dtos.UpdatePostDto;
+import org.blog.blog_application.dtos.PostCreateDto;
+import org.blog.blog_application.dtos.PostResponseDto;
+import org.blog.blog_application.dtos.PostUpdateDto;
 import org.blog.blog_application.mapper.PostMapper;
 import org.blog.blog_application.models.Post;
 import org.blog.blog_application.models.PostTag;
-import org.blog.blog_application.models.Tag;
 import org.blog.blog_application.repositories.PostRepository;
-import org.blog.blog_application.repositories.TagRepository;
+import org.blog.blog_application.services.PostService;
+import org.blog.blog_application.services.TagService;
 import org.blog.blog_application.specification.PostSpecification;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.*;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
-import java.util.HashSet;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
-import java.util.Set;
 
-@Service("PostServiceImplBasic")
-public class PostServiceImpl implements PostService{
-    private final TagRepository tagRepository;
+@Service
+public class PostServiceImpl implements PostService {
+
     private PostRepository postRepository;
     private TagService tagService;
-    private PostMapper postMapper;
 
-    public PostServiceImpl(PostRepository postRepository, TagService tagService,
-                           PostMapper postMapper, TagRepository tagRepository) {
+    public PostServiceImpl(PostRepository postRepository,TagService tagService) {
         this.postRepository = postRepository;
         this.tagService = tagService;
-        this.postMapper=postMapper;
-        this.tagRepository = tagRepository;
     }
 
     @Override
-    public List<Post> getAllPosts() {
+    public void createPost(PostCreateDto dto) {
+        Post post = new Post();
+        post.setTitle(dto.getTitle());
+        post.setExcerpt(dto.getExcerpt());
+        post.setContent(dto.getContent());
+        post.setAuthor(dto.getAuthor());
+        post.setPublishedAt(LocalDateTime.now());
 
-        return postRepository.findAll();
-    }
-
-    @Override
-    @Transactional
-    public void createPostWithTags(Post post, String customTags) {
-        Set<String> validTags = new HashSet<>();
-        if(customTags != null && ! customTags.trim().isEmpty()){
-            String[] tags = customTags.split(",");
-            for(String tag : tags){
-                String trimmedTag = tag.trim().toLowerCase();
-                if(! trimmedTag.isEmpty()){
-                    validTags.add(trimmedTag);
-                }
-            }
-        }
-        for(String tag : validTags){
-            Tag finalTag = tagService.getOrCreateTag(tag);
-
-            PostTag postTagConnector = new PostTag();
-            postTagConnector.setPost(post);
-            postTagConnector.setTag(finalTag);
-
-            post.getPostTags().add(postTagConnector);
-        }
-        post.setPublished(true);
         postRepository.save(post);
+        tagService.attachTags(post, dto.getTags());
     }
+    @Override
+    public List<PostResponseDto> getAllPosts() {
 
-    @Override
-    public Post getSinglePost(Long postId) {
-        Optional<Post> optionalPost = postRepository.findById(postId);
-        return optionalPost.get();
+        List<Post> posts = postRepository.findAll();
+        List<PostResponseDto> dtoList = new ArrayList<>();
+
+        for (Post post : posts) {
+            dtoList.add(PostMapper.convertToDto(post));
+        }
+        return dtoList;
     }
     @Override
-    public UpdatePostDto getPostForUpdate(Long postId) {
+    public PostResponseDto getPostById(Long postId) {
 
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new RuntimeException("Post not found"));
 
-        return postMapper.toUpdateDTO(post);
+        return PostMapper.convertToDto(post);
     }
     @Override
-    @Transactional
-    public void updatePost(Long id, UpdatePostDto dto) {
+    public Page<PostResponseDto> getPostPagination(String search, int pageNumber,
+                                                   int pageSize,
+                                                   Sort sort) {
+        Specification<Post> specification = PostSpecification.getSpecification(search);
 
-        Post post = postRepository.findById(id)
+        Pageable pageable = PageRequest.of(pageNumber, pageSize, sort);
+
+        Page<Post> postPage = postRepository.findAll(specification, pageable);
+
+        List<PostResponseDto> dtoList = new ArrayList<>();
+
+        for (Post post : postPage.getContent()) {
+            dtoList.add(PostMapper.convertToDto(post));
+        }
+        return new PageImpl<>(dtoList, pageable,
+                postPage.getTotalElements());
+    }
+    @Override
+    public PostUpdateDto getPostForUpdate(Long postId) {
+        Post post = postRepository.findById(postId)
+                .orElseThrow(() -> new RuntimeException("Post not found"));
+
+        PostUpdateDto dto = new PostUpdateDto();
+
+        dto.setId(post.getId());
+        dto.setTitle(post.getTitle());
+        dto.setExcerpt(post.getExcerpt());
+        dto.setContent(post.getContent());
+        dto.setAuthor(post.getAuthor());
+        dto.setPublishedAt(post.getPublishedAt());
+
+        // tags → string
+        StringBuilder tagsBuilder = new StringBuilder();
+
+        for (PostTag postTag : post.getPostTags()) {
+            tagsBuilder.append(postTag.getTag().getName()).append(",");
+        }
+        if (tagsBuilder.length() > 0) {
+            tagsBuilder.deleteCharAt(tagsBuilder.length() - 1);
+        }
+        dto.setTags(tagsBuilder.toString());
+        return dto;
+    }
+    @Override
+    public void updatePost(Long postId, PostUpdateDto dto) {
+
+        Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new RuntimeException("Post not found"));
 
         post.setTitle(dto.getTitle());
+        post.setExcerpt(dto.getExcerpt());
         post.setContent(dto.getContent());
         post.setAuthor(dto.getAuthor());
-        post.setPublishedAt(dto.getPublishedAt());
+        tagService.updateTags(post, dto.getTags());
+        //post.setPublishedAt(dto.getPublishedAt());
+        postRepository.save(post);
 
-        post.getPostTags().clear();
 
-        if (dto.getTags() != null) {
-
-            String[] tags = dto.getTags().split(",");
-
-            for (String tagName : tags) {
-
-                Tag tag = tagService.getOrCreateTag(tagName.trim());
-
-                PostTag pt = new PostTag();
-                pt.setPost(post);
-                pt.setTag(tag);
-
-                post.getPostTags().add(pt);
-            }
-        }
     }
-
     @Override
-    @Transactional
     public void deletePost(Long postId) {
-        Post post = postRepository.findById(postId)
-                .orElseThrow(() -> new RuntimeException("Post not found"));
         postRepository.deleteById(postId);
     }
-    @Override
-    public Page<Post> getPostPagination(String search, int pageNumber, int pageSize, Sort sort) {
-//        Sort sort = Sort.by(Sort.Direction.ASC, "publishedAt");
-        Specification<Post> specification = PostSpecification.getSpecification(search);
-        PageRequest pageRequest = PageRequest.of(pageNumber, pageSize,sort);
-        return postRepository.findAll(specification,pageRequest);
-    }
-
-
-
 }

@@ -1,12 +1,13 @@
 package org.blog.blog_application.controllers;
 
 import org.blog.blog_application.dtos.CommentDto;
-import org.blog.blog_application.dtos.UpdatePostDto;
+import org.blog.blog_application.dtos.PostCreateDto;
+import org.blog.blog_application.dtos.PostResponseDto;
+import org.blog.blog_application.dtos.PostUpdateDto;
 import org.blog.blog_application.models.Post;
 import org.blog.blog_application.services.CommentService;
 import org.blog.blog_application.services.PostService;
 import org.blog.blog_application.services.TagService;
-import org.springframework.core.annotation.MergedAnnotations;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Controller;
@@ -17,14 +18,12 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/blog")
 public class PostController {
     private PostService postService;
-    private TagService tagService;
     private CommentService commentService;
 
-    public PostController(PostService postService, TagService tagService, CommentService commentService) {
+    public PostController(PostService postService, CommentService commentService) {
 
         this.postService = postService;
-        this.tagService = tagService;
-        this.commentService=commentService;
+        this.commentService = commentService;
     }
     @GetMapping("/posts")
     public String getAllPosts(@RequestParam(defaultValue = "1")int start,
@@ -42,7 +41,7 @@ public class PostController {
                 Sort.by(sortBy).ascending() :
                 Sort.by(sortBy).descending();
 
-        Page<Post> postPage = postService.getPostPagination(search, pageIndex, limit, sort);
+        Page<PostResponseDto> postPage = postService.getPostPagination(search, pageIndex, limit, sort);
         model.addAttribute("posts", postPage.getContent());
         model.addAttribute("start", start);
         model.addAttribute("limit", limit);
@@ -55,17 +54,17 @@ public class PostController {
     }
     @GetMapping("/posts/create")
     public String createPostForm(Model model){
-        model.addAttribute("post", new Post());
+        model.addAttribute("post", new PostCreateDto());
         return "create-Form";
     }
     @PostMapping("/posts")
-    public String createPost(@ModelAttribute Post post, @RequestParam(value = "customTags",required = false) String customTags){
-        postService.createPostWithTags(post, customTags);
+    public String createPost(@ModelAttribute PostCreateDto dto){
+        postService.createPost(dto);
         return "redirect:/blog/posts";
     }
     @GetMapping("/posts/{postId}")
-    public String viewPost(@PathVariable("postId") Long postId, Model model){
-        Post post = postService.getSinglePost(postId);
+    public String viewPost(@PathVariable Long postId, Model model){
+        PostResponseDto post = postService.getPostById(postId);
         model.addAttribute("post", post);
         model.addAttribute("commentDto", new CommentDto());
         model.addAttribute("comments", commentService.getCommentsByPostId(postId));
@@ -74,16 +73,14 @@ public class PostController {
     @GetMapping("/posts/update/{postId}")
     public String editForm(@PathVariable Long postId, Model model) {
 
-        UpdatePostDto dto = postService.getPostForUpdate(postId);
+        PostUpdateDto dto = postService.getPostForUpdate(postId);
 
         model.addAttribute("post", dto);
-        model.addAttribute("allTags", tagService.getAllTags());
-
         return "edit-post";
     }
     @PostMapping("/posts/update/{postId}")
     public String updatePost(@PathVariable Long postId,
-                             @ModelAttribute UpdatePostDto dto) {
+                             @ModelAttribute PostUpdateDto dto) {
 
         postService.updatePost(postId, dto);
 

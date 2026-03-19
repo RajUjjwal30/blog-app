@@ -6,13 +6,16 @@
 </div>
 
 <body>
+
 <form th:action="@{/blog/posts}" method="get">
 
-  <input type="hidden" name="page" value="1"/>
+  <input type="hidden" name="start" value="1"/>
+  <input type="hidden" name="limit" th:value="${limit != null ? limit : 10}" />
+  <input type="hidden" name="search" th:value="${search != null ? search : ''}" />
 
   <!-- Sort By -->
   <select name="sortBy">
-    <option value="publishedAt" th:selected="${sortBy == 'publishedAt'}">PublishedDateTime</option>
+    <option value="publishedAt" th:selected="${sortBy != null and sortBy == 'publishedAt'}">PublishedDateTime</option>
 <!--    <option value="title" th:selected="${sortBy == 'title'}">Title</option>-->
 <!--    <option value="author" th:selected="${sortBy == 'author'}">Author</option>-->
   </select>
@@ -41,15 +44,16 @@
     <p>
       <strong th:text="${post.author}"></strong>
       |
-      <span th:text="${#temporals.format(post.publishedAt, 'dd MMM yyyy')}"></span>
+      <span th:text="${post.publishedAt != null ? #temporals.format(post.publishedAt, 'dd MMM yyyy') : 'N/A'}"></span>
     </p>
 
     <div>
       <strong>Tags:</strong>
-            <span th:each="pt : ${post.postTags}"
-                  class="badge bg-secondary me-1"
-                  th:text="${pt.tag.name}">
-            </span>
+
+      <span th:each="tag : ${post.tags}"
+            th:text="${tag}"
+            class="badge bg-secondary me-1">
+      </span>
     </div>
 
     <p th:text="${post.excerpt}"></p>

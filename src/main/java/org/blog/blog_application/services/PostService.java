@@ -1,28 +1,29 @@
 package org.blog.blog_application.services;
 
-import org.blog.blog_application.dtos.UpdatePostDto;
-import org.blog.blog_application.models.Post;
-import org.springframework.core.annotation.MergedAnnotations;
+import org.blog.blog_application.dtos.PostCreateDto;
+import org.blog.blog_application.dtos.PostResponseDto;
+import org.blog.blog_application.dtos.PostUpdateDto;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Sort;
-import org.springframework.data.jpa.domain.Specification;
 
 import java.util.List;
 
 public interface PostService {
-    List<Post> getAllPosts();
 
-    void createPostWithTags(Post post, String customTags);
+    void createPost(PostCreateDto dto);
 
-    Post getSinglePost(Long postId);
+    List<PostResponseDto> getAllPosts();
 
-    UpdatePostDto getPostForUpdate(Long postId);
-    void updatePost(Long postId, UpdatePostDto dto);
+    PostResponseDto getPostById(Long postId);
+
+    Page<PostResponseDto> getPostPagination(String search,
+                                            int pageNumber,
+                                            int pageSize,
+                                            Sort sort);
+
+    PostUpdateDto getPostForUpdate(Long postId);
+
+    void updatePost(Long postId, PostUpdateDto dto);
 
     void deletePost(Long postId);
-
-    Page<Post> getPostPagination(String search,int pageNumber, int pageSize, Sort sort);
-
-
-    //Page<Post> getPostPagination(String search, int pageNumber, int pageSize, Sort sort);
 }

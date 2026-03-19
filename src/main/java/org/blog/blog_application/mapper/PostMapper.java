@@ -1,6 +1,6 @@
 package org.blog.blog_application.mapper;
 
-import org.blog.blog_application.dtos.UpdatePostDto;
+import org.blog.blog_application.dtos.PostResponseDto;
 import org.blog.blog_application.models.Post;
 import org.blog.blog_application.models.PostTag;
 import org.springframework.stereotype.Component;
@@ -10,27 +10,26 @@ import java.util.List;
 
 @Component
 public class PostMapper {
-    public UpdatePostDto toUpdateDTO(Post post) {
+    public static PostResponseDto convertToDto(Post post) {
 
-        UpdatePostDto dto = new UpdatePostDto();
+        PostResponseDto dto = new PostResponseDto();
 
         dto.setId(post.getId());
         dto.setTitle(post.getTitle());
+        dto.setExcerpt(post.getExcerpt());
         dto.setContent(post.getContent());
         dto.setAuthor(post.getAuthor());
         dto.setPublishedAt(post.getPublishedAt());
 
-        StringBuilder tags = new StringBuilder();
+        List<String> tagNames = new ArrayList<>();
+        for (PostTag postTag : post.getPostTags()) {
 
-        for (PostTag pt : post.getPostTags()) {
-
-            if (tags.length() > 0) {
-                tags.append(",");
-            }
-
-            tags.append(pt.getTag().getName());
+//            if (tags.length() > 0) {
+//                tags.append(",");
+//            }
+            tagNames.add(postTag.getTag().getName());
         }
-        dto.setTags(tags.toString());
+        dto.setTags(tagNames);
         return dto;
     }
 }
