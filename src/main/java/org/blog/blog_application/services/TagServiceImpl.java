@@ -1,5 +1,7 @@
 package org.blog.blog_application.services;
 
+import org.blog.blog_application.dtos.AuthorDto;
+import org.blog.blog_application.dtos.TagDto;
 import org.blog.blog_application.models.Post;
 import org.blog.blog_application.models.PostTag;
 import org.blog.blog_application.models.Tag;
@@ -13,7 +15,7 @@ import java.util.*;
 
 @Service("TagServiceBasic")
 public class TagServiceImpl implements TagService {
-    private final PostRepository postRepository;
+    private PostRepository postRepository;
     private TagRepository tagRepository;
     private PostTagRepository postTagRepository;
 
@@ -68,6 +70,16 @@ public class TagServiceImpl implements TagService {
         postTagRepository.deleteAllByPost(post);
         postRepository.save(post);
         attachTags(post, tags);
+    }
+
+    public List<TagDto> getAllTagsDto() {
+
+        return tagRepository.findAll().stream().map( tag -> {
+            TagDto tagDto = new TagDto();
+            tagDto.setId(tag.getId());
+            tagDto.setName(tag.getName());
+            return tagDto;
+        }).toList();
     }
 
 }

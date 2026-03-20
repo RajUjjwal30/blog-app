@@ -23,12 +23,14 @@ public class PostController {
     private PostService postService;
     private CommentService commentService;
     private TagRepository tagRepository;
+    private TagService tagService;
 
-    public PostController(PostService postService, CommentService commentService, TagRepository tagRepository) {
+    public PostController(PostService postService, CommentService commentService, TagRepository tagRepository, TagService tagService) {
 
         this.postService = postService;
         this.commentService = commentService;
         this.tagRepository = tagRepository;
+        this.tagService = tagService;
     }
     @GetMapping("/posts")
     public String getAllPosts(@RequestParam(defaultValue = "1")int start,
@@ -37,7 +39,7 @@ public class PostController {
                               @RequestParam(required = false, defaultValue = "") Long authorId,
                               @RequestParam(required = false,defaultValue = "publishedAt") String sortField ,
                               @RequestParam(required = false,defaultValue = "asc") String direction,
-                              @RequestParam(required = false) Long tagId,Model model){
+                              @RequestParam(required = false) List<Long> tagIds,Model model){
 
         if (start < 1) start = 1;
         if (limit <= 0) limit = 10;
@@ -47,7 +49,6 @@ public class PostController {
         Sort sort = direction.equalsIgnoreCase("asc") ?
                 Sort.by(sortField).ascending() :
                 Sort.by(sortField).descending();
-        List<Long> tagIds = tagId != null ? List.of(tagId) : null;
         Page<PostResponseDto> postPage = postService.getPostPagination(search,tagIds, authorId, pageIndex, limit, sort);
         model.addAttribute("posts", postPage.getContent());
         model.addAttribute("start", start);
@@ -59,9 +60,10 @@ public class PostController {
         model.addAttribute("direction", direction);
 
         model.addAttribute("allTags", tagRepository.findAll());
-        model.addAttribute("selectedTagId", tagId);
+//        model.addAttribute("selectedTagId", tagIds);
 
         model.addAttribute("authors",        postService.getAllAuthors());
+        model.addAttribute("tags",        tagService.getAllTagsDto());
         model.addAttribute("selectedAuthor", "");
         return "blog-home";
     }
