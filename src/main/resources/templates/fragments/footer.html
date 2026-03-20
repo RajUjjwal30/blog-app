@@ -8,8 +8,12 @@
                 th:classappend="${start <= 1} ? 'disabled'">
                 <a class="page-link"
                    th:href="@{/blog/posts(
-                        start=${start - limit > 0 ? start - limit : 1},
-                        limit=${limit}
+                        start=${(start - limit) > 0 ? (start - limit) : 1},
+                        limit=${limit},
+                        search=${search},
+                        authorId=${authorId},
+                        sortField=${sortField},
+                        direction=${order}
                    )}">
                     Previous
                 </a>
@@ -23,7 +27,11 @@
                 <a class="page-link"
                    th:href="@{/blog/posts(
                         start=${(i - 1) * limit + 1},
-                        limit=${limit}
+                        limit=${limit},
+                        search=${search},
+                        authorId=${authorId},
+                        sortField=${sortField},
+                        direction=${order}
                    )}"
                    th:text="${i}">
                 </a>
@@ -35,7 +43,11 @@
                 <a class="page-link"
                    th:href="@{/blog/posts(
                         start=${start + limit},
-                        limit=${limit}
+                        limit=${limit},
+                        search=${search},
+                        authorId=${authorId},
+                        sortField=${sortField},
+                        direction=${order}
                    )}">
                     Next
                 </a>

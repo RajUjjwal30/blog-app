@@ -5,6 +5,7 @@ import org.blog.blog_application.dtos.PostCreateDto;
 import org.blog.blog_application.dtos.PostResponseDto;
 import org.blog.blog_application.dtos.PostUpdateDto;
 import org.blog.blog_application.models.Post;
+import org.blog.blog_application.repositories.TagRepository;
 import org.blog.blog_application.services.CommentService;
 import org.blog.blog_application.services.PostService;
 import org.blog.blog_application.services.TagService;
@@ -14,23 +15,29 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @Controller
 @RequestMapping("/blog")
 public class PostController {
     private PostService postService;
     private CommentService commentService;
+    private TagRepository tagRepository;
 
-    public PostController(PostService postService, CommentService commentService) {
+    public PostController(PostService postService, CommentService commentService, TagRepository tagRepository) {
 
         this.postService = postService;
         this.commentService = commentService;
+        this.tagRepository = tagRepository;
     }
     @GetMapping("/posts")
     public String getAllPosts(@RequestParam(defaultValue = "1")int start,
-                              @RequestParam(defaultValue="10")int limit,
+                              @RequestParam(defaultValue="1")int limit,
                               @RequestParam(required = false) String search,
+                              @RequestParam(required = false, defaultValue = "") Long authorId,
                               @RequestParam(required = false,defaultValue = "publishedAt") String sortField ,
-                              @RequestParam(required = false,defaultValue = "asc") String direction, Model model){
+                              @RequestParam(required = false,defaultValue = "asc") String direction,
+                              @RequestParam(required = false) Long tagId,Model model){
 
         if (start < 1) start = 1;
         if (limit <= 0) limit = 10;
@@ -40,8 +47,8 @@ public class PostController {
         Sort sort = direction.equalsIgnoreCase("asc") ?
                 Sort.by(sortField).ascending() :
                 Sort.by(sortField).descending();
-
-        Page<PostResponseDto> postPage = postService.getPostPagination(search, pageIndex, limit, sort);
+        List<Long> tagIds = tagId != null ? List.of(tagId) : null;
+        Page<PostResponseDto> postPage = postService.getPostPagination(search,tagIds, authorId, pageIndex, limit, sort);
         model.addAttribute("posts", postPage.getContent());
         model.addAttribute("start", start);
         model.addAttribute("limit", limit);
@@ -50,6 +57,12 @@ public class PostController {
         model.addAttribute("search", search);
         model.addAttribute("sortBy", sortField);
         model.addAttribute("direction", direction);
+
+        model.addAttribute("allTags", tagRepository.findAll());
+        model.addAttribute("selectedTagId", tagId);
+
+        model.addAttribute("authors",        postService.getAllAuthors());
+        model.addAttribute("selectedAuthor", "");
         return "blog-home";
     }
     @GetMapping("/posts/create")
@@ -92,5 +105,15 @@ public class PostController {
         postService.deletePost(postId);
         return "redirect:/blog/posts";
     }
-
+//    @GetMapping("/posts/by-author")
+//    public String filterByAuthor(
+//            @RequestParam(required = false, defaultValue = "") String author,
+//            Model model) {
+//
+//        model.addAttribute("posts",postService.getPostsByAuthorName(author));
+//        model.addAttribute("authors",postService.getAllAuthorNames());
+//        model.addAttribute("selectedAuthor", author);
+//
+//        return "blog-home";
+//    }
 }

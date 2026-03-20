@@ -1,70 +1,72 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
-<div th:replace="fragments/header ::header">
-</div>
-<div th:replace="fragments/header ::navbar">
-</div>
-
+<head></head>
 <body>
+<div th:replace="fragments/header ::header"></div>
+<div th:replace="fragments/header ::navbar"></div>
+<div class="container mt-4">
 
-<form th:action="@{/blog/posts}" method="get">
+  <div class="card p-3 mb-4">
+    <form th:action="@{/blog/posts}" method="get" class="row g-3 align-items-end">
+      <input type="hidden" name="search" th:value="${search}" />
+      <div class="col-md-3">
+        <label class="form-label small fw-semibold text-uppercase text-muted" for="author">Author</label>
+        <select id="author" name="authorId" class="form-select form-select-sm">
+          <option value="">All authors</option>
+          <option th:each="author : ${authors}"
+                  th:value="${author.id}"
+                  th:text="${author.name}"
+                  th:selected="${authors != null and authors.contains(author.id)}">
+          </option>
+        </select>
+      </div>
 
-  <input type="hidden" name="start" value="1"/>
-  <input type="hidden" name="limit" th:value="${limit != null ? limit : 10}" />
-  <input type="hidden" name="search" th:value="${search != null ? search : ''}" />
+      <div class="col-md-3">
+        <label class="form-label small fw-semibold text-uppercase text-muted" for="sortField">Sort By</label>
+        <select id="sortField" name="sortField" class="form-select form-select-sm">
+          <option value="publishedAt" th:selected="${sortField == 'publishedAt'}">Published Date</option>
+        </select>
+      </div>
 
-  <!-- Sort By -->
-  <select name="sortField">
-    <option value="publishedAt" th:selected="${sortField != null and sortBy == 'publishedAt'}">PublishedDateTime</option>
-<!--    <option value="title" th:selected="${sortBy == 'title'}">Title</option>-->
-<!--    <option value="author" th:selected="${sortBy == 'author'}">Author</option>-->
-  </select>
+      <div class="col-md-2">
+        <label class="form-label small fw-semibold text-uppercase text-muted" for="direction">Order</label>
+        <select id="direction" name="direction" class="form-select form-select-sm">
+          <option value="asc" th:selected="${order == 'asc'}">Ascending</option>
+          <option value="desc" th:selected="${order == 'desc'}">Descending</option>
+        </select>
+      </div>
 
-  <!-- Direction -->
-  <select name="direction">
-    <option value="asc" th:selected="${order == 'asc'}">Ascending</option>
-    <option value="desc" th:selected="${order == 'desc'}">Descending</option>
-  </select>
+      <div class="col-auto d-flex gap-2">
+        <button type="submit" class="btn btn-dark btn-sm">Apply</button>
+        <a th:href="@{/blog/posts}" class="btn btn-outline-secondary btn-sm">Reset</a>
+      </div>
 
-  <button type="submit">Sort</button>
+    </form>
+  </div>
 
-</form>
-<div class="container">
 
   <h1>Posts that you can Enjoy!</h1>
-
   <div th:each="post : ${posts}" class="card mb-4 p-3">
-
     <h3>
       <a th:href="@{/blog/posts/{id}(id=${post.id})}"
          th:text="${post.title}">
       </a>
     </h3>
-
     <p>
       <strong th:text="${post.author}"></strong>
       |
       <span th:text="${post.publishedAt != null ? #temporals.format(post.publishedAt, 'dd MMM yyyy') : 'N/A'}"></span>
     </p>
-
     <div>
       <strong>Tags:</strong>
-
       <span th:each="tag : ${post.tags}"
             th:text="${tag}"
             class="badge bg-secondary me-1">
       </span>
     </div>
-
     <p th:text="${post.excerpt}"></p>
-
   </div>
-
 </div>
-<div th:replace="fragments/footer ::footer">
-</div>
+<div th:replace="fragments/footer ::footer"></div>
 </body>
 </html>
-
-
-

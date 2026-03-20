@@ -1,5 +1,6 @@
-package org.blog.blog_application.services.impl;
+package org.blog.blog_application.services;
 
+import org.blog.blog_application.dtos.AuthorDto;
 import org.blog.blog_application.dtos.PostCreateDto;
 import org.blog.blog_application.dtos.PostResponseDto;
 import org.blog.blog_application.dtos.PostUpdateDto;
@@ -71,10 +72,10 @@ public class PostServiceImpl implements PostService {
         return PostMapper.convertToDto(post);
     }
     @Override
-    public Page<PostResponseDto> getPostPagination(String search, int pageNumber,
+    public Page<PostResponseDto> getPostPagination(String search,List<Long> tagIds, Long authorId,  int pageNumber,
                                                    int pageSize,
                                                    Sort sort) {
-        Specification<Post> specification = PostSpecification.getSpecification(search);
+        Specification<Post> specification = PostSpecification.build(search,authorId, tagIds);
 
         Pageable pageable = PageRequest.of(pageNumber, pageSize, sort);
 
@@ -120,12 +121,9 @@ public class PostServiceImpl implements PostService {
 
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new RuntimeException("Post not found"));
-        User author = userRepository.findById(dto.getAuthorId())
-                .orElseThrow(() -> new RuntimeException("User not found"));
         post.setTitle(dto.getTitle());
         post.setExcerpt(dto.getExcerpt());
         post.setContent(dto.getContent());
-        post.setAuthor(author);
         tagService.updateTags(post, dto.getTags());
         //post.setPublishedAt(dto.getPublishedAt());
         postRepository.save(post);
@@ -135,5 +133,30 @@ public class PostServiceImpl implements PostService {
     @Override
     public void deletePost(Long postId) {
         postRepository.deleteById(postId);
+    }
+    @Override
+    public List<PostResponseDto> getPostsByAuthorName(String authorName) {
+        if (authorName == null || authorName.isBlank()) return getAllPosts();
+        List<Post> posts = postRepository.findByAuthor_NameIgnoreCase(authorName.trim());
+        List<PostResponseDto> dtoList = new ArrayList<>();
+        for (Post post : posts) {
+            dtoList.add(PostMapper.convertToDto(post));
+        }
+        return dtoList;
+    }
+
+    @Override
+    public List<String> getAllAuthorNames() {
+        return postRepository.findDistinctAuthorNames();
+    }
+
+    public List<AuthorDto> getAllAuthors() {
+
+        return userRepository.findAll().stream().map( user -> {
+            AuthorDto authorDto = new AuthorDto();
+            authorDto.setId(user.getId());
+            authorDto.setName(user.getName());
+            return authorDto;
+        }).toList();
     }
 }
