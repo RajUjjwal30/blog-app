@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<div th:replace="fragments/header :: header"></div>
+<body>
+<div th:replace="fragments/header :: navbar"></div>
+<div class="container mt-5" style="max-width: 480px;">
+    <div class="card shadow-sm">
+        <div class="card-header bg-dark text-white text-center py-3">
+            <h4 class="mb-0">Create Account</h4>
+        </div>
+        <div class="card-body p-4">
+
+            <div th:if="${error}" class="alert alert-danger" th:text="${error}"></div>
+
+            <form th:action="@{/register}" th:object="${registerDto}" method="post">
+
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">Display Name</label>
+                    <input type="text" class="form-control"
+                           placeholder="Shown as author on posts"
+                           th:field="*{displayName}" required/>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">Username</label>
+                    <input type="text" class="form-control"
+                           placeholder="Used to login"
+                           th:field="*{username}" required/>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">Email</label>
+                    <input type="email" class="form-control"
+                           th:field="*{email}" required/>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">Password</label>
+                    <input type="password" class="form-control"
+                           placeholder="Min 6 characters"
+                           th:field="*{password}" required/>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">Role</label>
+                    <select class="form-select" th:field="*{role}">
+                        <option value="ROLE_USER">User (read + comment)</option>
+                        <option value="ROLE_AUTHOR">Author (create/edit own posts)</option>
+                        <option value="ROLE_ADMIN">Admin (manage all posts)</option>
+                    </select>
+                    <div class="form-text text-muted">
+                        In production, only admins would assign roles.
+                        This selector is for development convenience.
+                    </div>
+                </div>
+
+                <button type="submit" class="btn btn-dark w-100">Register</button>
+            </form>
+
+            <div class="mt-3 text-center">
+                <small>Already have an account? <a th:href="@{/login}">Login</a></small>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

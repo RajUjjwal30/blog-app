@@ -1,9 +1,13 @@
 package org.blog.blog_application.mapper;
 
+import lombok.Getter;
+import lombok.Setter;
 import org.blog.blog_application.dtos.CommentDto;
 import org.blog.blog_application.models.Comment;
 import org.blog.blog_application.models.Post;
+import org.springframework.stereotype.Component;
 
+@Component
 public class CommentMapper {
     //  Entity => DTO
       public static CommentDto toDto(Comment comment) {

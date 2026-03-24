@@ -19,6 +19,7 @@ public class PostMapper {
         dto.setExcerpt(post.getExcerpt());
         dto.setContent(post.getContent());
         dto.setAuthor(post.getAuthor() != null ? post.getAuthor().getName() : "Unknown");
+        dto.setAuthorUsername(post.getAuthor() != null ? post.getAuthor().getUsername() : null);
         dto.setPublishedAt(post.getPublishedAt());
 
         List<String> tagNames = new ArrayList<>();

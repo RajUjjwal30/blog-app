@@ -1,104 +1,152 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head></head>
-<body>
+<body style="background:#fff; color:#000;">
 <div th:replace="fragments/header ::header"></div>
 <div th:replace="fragments/header ::navbar"></div>
+
 <div class="container mt-4">
 
-  <div class="card p-3 mb-4">
+  <!-- Filter Bar -->
+  <div style="border: 2px solid #000; padding: 16px; margin-bottom: 28px;">
     <form th:action="@{/blog/posts}" method="get" class="row g-3 align-items-end">
       <input type="hidden" name="search" th:value="${search}" />
+
       <div class="col-md-3">
-        <label class="form-label small fw-semibold text-uppercase text-muted" for="author">Author</label>
-        <select id="author" name="authorId" class="form-select form-select-sm">
+        <label class="form-label small fw-bold text-uppercase" for="author" style="color:#000;">Author</label>
+        <select id="author" name="authorId" class="form-select form-select-sm"
+                style="border-color:#000; border-radius:0;">
           <option value="">All authors</option>
           <option th:each="author : ${authors}"
                   th:value="${author.id}"
                   th:text="${author.name}"
-                  th:selected="${authors != null and authors.contains(author.id)}">
+                  th:selected="${selectedAuthorId != null and author.id == selectedAuthorId}">
           </option>
         </select>
       </div>
 
-      <!-- Tags Dropdown Checkbox -->
+      <!-- Tags Dropdown -->
       <div class="col-md-3" style="position: relative;">
-        <label class="form-label small fw-semibold text-uppercase text-muted">Tags</label>
-
-        <!-- Trigger -->
+        <label class="form-label small fw-bold text-uppercase" style="color:#000;">Tags</label>
         <div id="tagDropdownTrigger"
              class="form-select form-select-sm d-flex align-items-center justify-content-between"
-             style="cursor:pointer; user-select:none; min-height:31px;"
+             style="cursor:pointer; user-select:none; min-height:31px; border-color:#000; border-radius:0;"
              onclick="toggleTagDropdown()">
-          <span id="tagDropdownLabel" class="text-muted small">All tags</span>
+          <span id="tagDropdownLabel" class="small" style="color:#555;">All tags</span>
           <span id="tagCaret" style="transition: transform .2s;">&#9662;</span>
         </div>
-
-        <!-- Panel -->
         <div id="tagDropdownPanel"
-             class="border rounded bg-white shadow-sm"
-             style="display:none; position:absolute; z-index:1000; width:100%;left:0; max-height:220px; overflow-y:auto; margin-top:2px;">
+             style="display:none; position:absolute; z-index:1000; width:100%; left:0;
+                    max-height:220px; overflow-y:auto; margin-top:2px;
+                    border: 1px solid #000; background:#fff;">
           <div th:each="tag : ${tags}" class="form-check px-3 py-1">
-            <input
-                    class="form-check-input tag-checkbox"
-                    type="checkbox"
-                    th:id="'tag-' + ${tag.id}"
-                    name="tagIds"
-                    th:value="${tag.id}"
-                    th:checked="${selectedTagIds != null and selectedTagIds.contains(tag.id)}"
-                    onchange="updateTagLabel()"
-            />
-            <label class="form-check-label small" th:for="'tag-' + ${tag.id}" th:text="${tag.name}">
-            </label>
+            <input class="form-check-input tag-checkbox" type="checkbox"
+                   th:id="'tag-' + ${tag.id}" name="tagIds" th:value="${tag.id}"
+                   th:checked="${selectedTagIds != null and selectedTagIds.contains(tag.id)}"
+                   onchange="updateTagLabel()" style="border-color:#000;" />
+            <label class="form-check-label small" th:for="'tag-' + ${tag.id}" th:text="${tag.name}"></label>
           </div>
-          <div th:if="${tags == null or tags.isEmpty()}" class="px-3 py-2 text-muted small">
+          <div th:if="${tags == null or tags.isEmpty()}" class="px-3 py-2 small" style="color:#555;">
             No tags available
           </div>
         </div>
       </div>
 
-      <div class="col-md-3">
-        <label class="form-label small fw-semibold text-uppercase text-muted" for="sortField">Sort By</label>
-        <select id="sortField" name="sortField" class="form-select form-select-sm">
-          <option value="publishedAt" th:selected="${sortField == 'publishedAt'}">Published Date</option>
-        </select>
-      </div>
-
       <div class="col-md-2">
-        <label class="form-label small fw-semibold text-uppercase text-muted" for="direction">Order</label>
-        <select id="direction" name="direction" class="form-select form-select-sm">
-          <option value="asc" th:selected="${order == 'asc'}">Ascending</option>
-          <option value="desc" th:selected="${order == 'desc'}">Descending</option>
+        <label class="form-label small fw-bold text-uppercase" for="direction" style="color:#000;">Order</label>
+        <select id="direction" name="direction" class="form-select form-select-sm"
+                style="border-color:#000; border-radius:0;">
+          <option value="desc" th:selected="${direction == 'desc'}">Newest first</option>
+          <option value="asc"  th:selected="${direction == 'asc'}">Oldest first</option>
         </select>
       </div>
 
       <div class="col-auto d-flex gap-2">
-        <button type="submit" class="btn btn-dark btn-sm">Apply</button>
-        <a th:href="@{/blog/posts}" class="btn btn-outline-secondary btn-sm">Reset</a>
+        <button type="submit" class="btn btn-sm"
+                style="background:#000; color:#fff; border-radius:0;">Apply</button>
+        <a th:href="@{/blog/posts}" class="btn btn-sm"
+           style="border:1px solid #000; color:#000; border-radius:0;">Reset</a>
       </div>
-
     </form>
   </div>
 
-  <h1>Posts that you can Enjoy!</h1>
-  <div th:each="post : ${posts}" class="card mb-4 p-3">
-    <h3>
-      <a th:href="@{/blog/posts/{id}(id=${post.id})}" th:text="${post.title}"></a>
-    </h3>
-    <p>
-      <strong th:text="${post.author}"></strong>
-      |
-      <span th:text="${post.publishedAt != null ? #temporals.format(post.publishedAt, 'dd MMM yyyy') : 'N/A'}"></span>
-    </p>
-    <div>
-      <strong>Tags:</strong>
-      <span th:each="tag : ${post.tags}" th:text="${tag}" class="badge bg-secondary me-1"></span>
+  <!-- Page Heading -->
+  <h2 style="font-weight:800; letter-spacing:1px; border-bottom:3px solid #000; padding-bottom:8px; margin-bottom:24px;">
+    POSTS
+  </h2>
+
+  <!-- No results -->
+  <div th:if="${#lists.isEmpty(posts)}"
+       style="text-align:center; padding:60px 0; color:#555;">
+    <p style="font-size:1.1rem;">No posts found.</p>
+    <a th:href="@{/blog/posts}" style="color:#000; text-decoration:underline;">Clear filters</a>
+  </div>
+
+  <!-- Post Grid: 2 columns, 3 rows = 6 per page -->
+  <div class="row row-cols-1 row-cols-md-2 g-4" th:if="${not #lists.isEmpty(posts)}">
+    <div class="col" th:each="post : ${posts}">
+      <div style="border: 2px solid #000; padding: 20px; height:100%;
+                  display:flex; flex-direction:column; background:#fff;">
+
+        <!-- Tags -->
+        <div style="margin-bottom:8px;">
+          <span th:each="tag : ${post.tags}"
+                th:text="${tag}"
+                style="font-size:0.7rem; font-weight:700; text-transform:uppercase;
+                       letter-spacing:1px; border:1px solid #000; padding:2px 6px;
+                       margin-right:4px; color:#000; background:#fff;">
+          </span>
+        </div>
+
+        <!-- Title -->
+        <h4 style="font-weight:800; margin-bottom:8px; flex-grow:0;">
+          <a th:href="@{/blog/posts/{id}(id=${post.id})}"
+             th:text="${post.title}"
+             style="color:#000; text-decoration:none;">
+          </a>
+        </h4>
+
+        <!-- Meta -->
+        <p style="font-size:0.8rem; color:#555; margin-bottom:10px;">
+          <strong th:text="${post.author}" style="color:#000;"></strong>
+          &nbsp;·&nbsp;
+          <span th:text="${post.publishedAt != null ? #temporals.format(post.publishedAt, 'dd MMM yyyy') : ''}"></span>
+        </p>
+
+        <!-- Excerpt -->
+        <p th:text="${post.excerpt}" style="flex-grow:1; color:#333; font-size:0.95rem;"></p>
+
+        <!-- Footer: Read more + actions -->
+        <div style="margin-top:12px; display:flex; align-items:center; gap:8px;">
+          <a th:href="@{/blog/posts/{id}(id=${post.id})}"
+             style="font-size:0.85rem; font-weight:700; text-transform:uppercase;
+                    letter-spacing:1px; color:#000; text-decoration:underline;">
+            Read →
+          </a>
+          <span sec:authorize="hasAnyRole('AUTHOR','ADMIN')" style="margin-left:auto; display:flex; gap:6px;">
+            <a th:href="@{/blog/posts/update/{id}(id=${post.id})}"
+               style="font-size:0.78rem; border:1px solid #000; padding:2px 8px;
+                      color:#000; text-decoration:none; font-weight:600;">Edit</a>
+            <form th:action="@{/blog/posts/delete/{id}(id=${post.id})}"
+                  method="post" style="display:inline;"
+                  onsubmit="return confirm('Delete this post?')">
+              <button type="submit"
+                      style="font-size:0.78rem; border:1px solid #000; padding:2px 8px;
+                             background:#000; color:#fff; font-weight:600; cursor:pointer;">
+                Delete
+              </button>
+            </form>
+          </span>
+        </div>
+
+      </div>
     </div>
-    <p th:text="${post.excerpt}"></p>
   </div>
 
 </div>
-<div th:replace="fragments/footer ::footer"></div>
+
+<!-- Pagination -->
+<div th:replace="fragments/footer ::pagination"></div>
 
 <script>
   function toggleTagDropdown() {
@@ -114,19 +162,18 @@
     const label = document.getElementById('tagDropdownLabel');
     if (checked.length === 0) {
       label.textContent = 'All tags';
-      label.classList.add('text-muted');
+      label.style.color = '#555';
     } else {
       const names = [...checked].map(cb =>
-              document.querySelector(`label[for="${cb.id}"]`).textContent.trim()
+        document.querySelector(`label[for="${cb.id}"]`).textContent.trim()
       );
       label.textContent = names.length > 2
-              ? `${names.slice(0, 2).join(', ')} +${names.length - 2}`
-              : names.join(', ');
-      label.classList.remove('text-muted');
+        ? `${names.slice(0, 2).join(', ')} +${names.length - 2}`
+        : names.join(', ');
+      label.style.color = '#000';
     }
   }
 
-  // Close dropdown when clicking outside
   document.addEventListener('click', function (e) {
     const trigger = document.getElementById('tagDropdownTrigger');
     const panel = document.getElementById('tagDropdownPanel');
@@ -136,7 +183,6 @@
     }
   });
 
-  // Restore label on page load if tags were pre-selected
   updateTagLabel();
 </script>
 </body>

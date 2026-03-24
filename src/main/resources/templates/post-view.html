@@ -1,35 +1,27 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
-<div th:replace="fragments/header ::header">
-</div>
-<div th:replace="fragments/header ::navbar">
-</div>
-<head>
-    <style>
-        .mb-3{
-            margin-left: 10px;
-            padding-left: 7.5px;
-        }
-
-    </style>
-</head>
-    <body>
+<head></head>
+<body>
+<div th:replace="fragments/header ::header"></div>
+<div th:replace="fragments/header ::navbar"></div>
     <div class="container">
+        <style>
+            .mb-3{
+                margin-left: 10px;
+                padding-left: 7.5px;
+            }
+        </style>
         <h1 th:text="${post.title}"></h1>
-        <div style="margin-bottom:15px">
 
-            <a th:href="@{/blog/posts/update/{id}(id=${post.id})}">
-                Edit Post
-            </a>
-
-            <form th:action="@{/blog/posts/delete/{id}(id=${post.id})}"
-                  method="post"
-                  style="display:inline;">
-                <button type="submit">
-                    Delete Post
-                </button>
+        <div style="margin-bottom:15px"
+             th:if="${isOwner or isAdmin}">
+            <a th:href="@{/blog/posts/update/{postId}(postId=${post.id})}"
+               class="btn btn-warning btn-sm">Edit Post</a>
+            <form th:action="@{/blog/posts/delete/{postId}(postId=${post.id})}"
+                  method="post" style="display:inline;"
+                  onsubmit="return confirm('Delete this post?')">
+                <button type="submit" class="btn btn-danger btn-sm">Delete Post</button>
             </form>
-
         </div>
 
         <p>
@@ -56,7 +48,6 @@
     </div>
     <hr>
     <hr>
-<!--    <h3 style="padding-left:10px">Add Comment</h3>-->
     <div class="card">
         <div class="card-header">
             <h2>Leave a Comment</h2>
@@ -103,23 +94,53 @@
             </div>
 
             <div th:each="comment : ${comments}" class="card mb-2">
-
                 <div class="card-body">
                     <h5 th:text="${comment.name}"></h5>
 
-                    <p th:text="${comment.content}"></p>
+                    <!-- Normal view -->
+                    <p th:id="'comment-text-' + ${comment.id}"
+                       th:text="${comment.content}"></p>
+
+                    <!-- Inline edit form (hidden by default, shown via JS) -->
+                    <form th:if="${isOwner or isAdmin}"
+                          th:id="'edit-form-' + ${comment.id}"
+                          th:action="@{/blog/comments/update/{id}(id=${comment.id})}"
+                          method="post"
+                          style="display:none; margin-top:8px;">
+                        <input type="hidden" name="postId" th:value="${post.id}" />
+                        <textarea name="content" rows="3" class="form-control mb-2"
+                                  th:text="${comment.content}"></textarea>
+                        <button type="submit" class="btn btn-sm btn-primary">Save</button>
+                        <button type="button" class="btn btn-sm btn-secondary"
+                                th:onclick="'toggleEdit(' + ${comment.id} + ')'">Cancel</button>
+                    </form>
 
                     <small th:text="${comment.email}"></small>
-                </div>
 
+                    <!-- Delete + Edit actions (post owner or admin only) -->
+                    <div th:if="${isOwner or isAdmin}" class="mt-2 d-flex gap-2">
+                        <button class="btn btn-sm btn-outline-secondary"
+                                th:onclick="'toggleEdit(' + ${comment.id} + ')'">Edit</button>
+                        <form th:action="@{/blog/comments/delete/{id}(id=${comment.id})}"
+                              method="post" style="display:inline;"
+                              onsubmit="return confirm('Delete this comment?')">
+                            <input type="hidden" name="postId" th:value="${post.id}" />
+                            <button type="submit" class="btn btn-sm btn-danger">Delete</button>
+                        </form>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 
-</body>
-    </html>
-
-
-
+<script>
+function toggleEdit(commentId) {
+    const text = document.getElementById('comment-text-' + commentId);
+    const form = document.getElementById('edit-form-' + commentId);
+    const hidden = text.style.display === 'none';
+    text.style.display = hidden ? '' : 'none';
+    form.style.display = hidden ? 'none' : 'block';
+}
+</script>
 </body>
 </html>

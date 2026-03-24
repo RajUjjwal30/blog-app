@@ -11,6 +11,7 @@ public class PostCreateDto {
     private String excerpt;
     private String content;
     private String authorName;
+    private String authorUsername;
     private Boolean isPublished;
     private String tags;
 

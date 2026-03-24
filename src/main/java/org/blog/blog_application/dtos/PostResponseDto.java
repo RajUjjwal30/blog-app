@@ -14,6 +14,7 @@ public class PostResponseDto {
     private String excerpt;
     private String content;
     private String author;
+    private String authorUsername;
     private LocalDateTime publishedAt;
     private List<String> tags = new ArrayList<>();
 }

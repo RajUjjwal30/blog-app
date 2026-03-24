@@ -15,6 +15,7 @@ public class PostUpdateDto {
         private String content;
         private Long authorId;
         private String authorName;
+        private String authorUsername;
         private LocalDateTime publishedAt;
         private String tags;
 }

@@ -1,59 +1,73 @@
 <footer th:fragment="pagination">
 
-    <nav>
+    <nav th:if="${totalPages > 1}" style="margin: 30px 0;">
         <ul class="pagination justify-content-center">
 
             <!-- Previous -->
-            <li class="page-item"
-                th:classappend="${start <= 1} ? 'disabled'">
-                <a class="page-link"
+            <li class="page-item" th:classappend="${page <= 1} ? 'disabled'">
+                <a class="page-link" style="color:#000; border-color:#000;"
                    th:href="@{/blog/posts(
-                        start=${(start - limit) > 0 ? (start - limit) : 1},
-                        limit=${limit},
+                        page=${page - 1},
                         search=${search},
-                        authorId=${authorId},
+                        authorId=${selectedAuthorId},
+                        tagIds=${selectedTagIds},
                         sortField=${sortField},
-                        direction=${order}
-                   )}">
-                    Previous
-                </a>
+                        direction=${direction}
+                   )}">&#8592; Prev</a>
             </li>
 
-            <!-- Page Numbers -->
-            <li class="page-item"
-                th:each="i : ${#numbers.sequence(1, totalPages)}"
-                th:classappend="${((i - 1) * limit + 1) == start} ? 'active'">
+            <!-- Page Numbers (windowed: show at most 5 around current page) -->
+            <th:block th:with="start=${page > 3 ? page - 2 : 1}, end=${page < totalPages - 2 ? page + 2 : totalPages}">
 
-                <a class="page-link"
-                   th:href="@{/blog/posts(
-                        start=${(i - 1) * limit + 1},
-                        limit=${limit},
-                        search=${search},
-                        authorId=${authorId},
-                        sortField=${sortField},
-                        direction=${order}
-                   )}"
-                   th:text="${i}">
-                </a>
-            </li>
+                <!-- First page + ellipsis -->
+                <li class="page-item" th:if="${start > 1}">
+                    <a class="page-link" style="color:#000; border-color:#000;"
+                       th:href="@{/blog/posts(page=1,search=${search},authorId=${selectedAuthorId},tagIds=${selectedTagIds},sortField=${sortField},direction=${direction})}">1</a>
+                </li>
+                <li class="page-item disabled" th:if="${start > 2}">
+                    <span class="page-link" style="border-color:#000;">…</span>
+                </li>
+
+                <!-- Window of page numbers -->
+                <li class="page-item"
+                    th:each="i : ${#numbers.sequence(start, end)}"
+                    th:classappend="${i == page} ? 'active'">
+                    <a class="page-link"
+                       th:style="${i == page} ? 'background:#000; border-color:#000; color:#fff;' : 'color:#000; border-color:#000;'"
+                       th:href="@{/blog/posts(page=${i},search=${search},authorId=${selectedAuthorId},tagIds=${selectedTagIds},sortField=${sortField},direction=${direction})}"
+                       th:text="${i}">
+                    </a>
+                </li>
+
+                <!-- Ellipsis + last page -->
+                <li class="page-item disabled" th:if="${end < totalPages - 1}">
+                    <span class="page-link" style="border-color:#000;">…</span>
+                </li>
+                <li class="page-item" th:if="${end < totalPages}">
+                    <a class="page-link" style="color:#000; border-color:#000;"
+                       th:href="@{/blog/posts(page=${totalPages},search=${search},authorId=${selectedAuthorId},tagIds=${selectedTagIds},sortField=${sortField},direction=${direction})}"
+                       th:text="${totalPages}">
+                    </a>
+                </li>
+
+            </th:block>
 
             <!-- Next -->
-            <li class="page-item"
-                th:classappend="${start + limit > totalPages * limit} ? 'disabled'">
-                <a class="page-link"
+            <li class="page-item" th:classappend="${page >= totalPages} ? 'disabled'">
+                <a class="page-link" style="color:#000; border-color:#000;"
                    th:href="@{/blog/posts(
-                        start=${start + limit},
-                        limit=${limit},
+                        page=${page + 1},
                         search=${search},
-                        authorId=${authorId},
+                        authorId=${selectedAuthorId},
+                        tagIds=${selectedTagIds},
                         sortField=${sortField},
-                        direction=${order}
-                   )}">
-                    Next
-                </a>
+                        direction=${direction}
+                   )}">Next &#8594;</a>
             </li>
 
         </ul>
+
+        <p class="text-center text-muted small">Page <span th:text="${page}"></span> of <span th:text="${totalPages}"></span></p>
     </nav>
 
 </footer>

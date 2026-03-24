@@ -1,8 +1,9 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
-<div th:replace="fragments/header :: header">
-</div>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head></head>
 <body>
+<div th:replace="fragments/header :: header"></div>
 <div th:replace="fragments/header :: navbar"></div>
 <div class="container">
     <div class="row col-md-8 offset-md-2">
@@ -14,63 +15,56 @@
                 <form role="form" method="post" th:action="@{/blog/posts}" th:object="${post}">
                     <div class="mb-3">
                         <label class="form-label">Title</label>
-                        <input
-                        type="text"
-                        class="form-control"
-                        id="title"
-                        placeholder="Enter post title"
-                        name="title"
-                        th:field="*{title}">
+                        <input type="text" class="form-control"
+                               placeholder="Enter post title"
+                               th:field="*{title}">
                     </div>
                     <div class="mb-3">
                         <label class="form-label">Excerpt</label>
-                        <textarea
-                            class="form-control"
-                            id="excerpt"
-                            placeholder="Enter short description"
-                            rows="3"
-                            name="excerpt"
-                            th:field="*{excerpt}">
+                        <textarea class="form-control"
+                                  placeholder="Enter short description"
+                                  rows="3"
+                                  th:field="*{excerpt}">
                         </textarea>
                     </div>
                     <div class="mb-3">
                         <label class="form-label">Content</label>
-                        <textarea
-                                class="form-control"
-                                id="content"
-                                placeholder="Write a beautiful thought... !"
-                                rows="12"
-                                name="content"
-                                th:field="*{content}">
+                        <textarea class="form-control"
+                                  placeholder="Write a beautiful thought... !"
+                                  rows="12"
+                                  th:field="*{content}">
                         </textarea>
                     </div>
+
+                    <!-- AUTHOR field: ADMIN sees a dropdown to pick any user; AUTHOR sees their own name (disabled) -->
                     <div class="mb-3">
                         <label class="form-label">Author</label>
-                        <input
-                                type="text"
-                                class="form-control"
-                                placeholder="Enter author name"
-                                th:field="*{authorName}">
+
+                        <!-- Admin: dropdown of all users -->
+                        <select sec:authorize="hasRole('ADMIN')"
+                                name="authorUsername"
+                                class="form-control">
+                            <option th:each="user : ${allUsers}"
+                                    th:value="${user.username}"
+                                    th:text="${user.name}">
+                            </option>
+                        </select>
+
+                        <!-- Author: own name, read-only -->
+                        <div sec:authorize="!hasRole('ADMIN')">
+                            <input type="text" class="form-control"
+                                   th:value="${#authentication.name}"
+                                   disabled>
+                        </div>
                     </div>
-<!--                    <div class="mb-3">-->
-<!--                        <label class="form-label">Published DateTime</label>-->
-<!--                        <input-->
-<!--                                type="datetime-local"-->
-<!--                                class="form-control"-->
-<!--                                id="published_at"-->
-<!--                                name="published_at"-->
-<!--                                th:field="*{publishedAt}">-->
-<!--                    </div>-->
+
                     <div class="mb-3">
-                        <label class="form-label">Tags to attach :</label>
-                        <input
-                                type="text"
-                                class="form-control"
-                                placeholder="e.g. java,spring,boot"
-                                th:field="*{tags}"
-                        >
+                        <label class="form-label">Tags (comma-separated)</label>
+                        <input type="text" class="form-control"
+                               placeholder="e.g. java,spring,boot"
+                               th:field="*{tags}">
                     </div>
-                    <button type="submit" class="btn btn-success">publish</button>
+                    <button type="submit" class="btn btn-success">Publish</button>
                 </form>
             </div>
         </div>

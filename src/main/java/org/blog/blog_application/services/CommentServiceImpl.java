@@ -34,4 +34,29 @@ public class CommentServiceImpl implements CommentService{
         }
         return dtoList;
     }
+
+    @Override
+    public void deleteComment(Long commentId, String currentUsername, boolean isAdmin) {
+        Comment comment = commentRepository.findById(commentId)
+                .orElseThrow(() -> new RuntimeException("Comment not found"));
+        String postAuthor = comment.getPost().getAuthor() != null
+                ? comment.getPost().getAuthor().getUsername() : null;
+        if (!isAdmin && !currentUsername.equals(postAuthor)) {
+            throw new RuntimeException("You can only delete comments on your own posts");
+        }
+        commentRepository.deleteById(commentId);
+    }
+
+    @Override
+    public void updateComment(Long commentId, String newContent, String currentUsername, boolean isAdmin) {
+        Comment comment = commentRepository.findById(commentId)
+                .orElseThrow(() -> new RuntimeException("Comment not found"));
+        String postAuthor = comment.getPost().getAuthor() != null
+                ? comment.getPost().getAuthor().getUsername() : null;
+        if (!isAdmin && !currentUsername.equals(postAuthor)) {
+            throw new RuntimeException("You can only edit comments on your own posts");
+        }
+        comment.setContent(newContent);
+        commentRepository.save(comment);
+    }
 }

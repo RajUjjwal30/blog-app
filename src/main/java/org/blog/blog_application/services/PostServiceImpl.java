@@ -40,17 +40,39 @@ public class PostServiceImpl implements PostService {
         post.setTitle(dto.getTitle());
         post.setExcerpt(dto.getExcerpt());
         post.setContent(dto.getContent());
-        User author = userRepository.findByName(dto.getAuthorName())
-                .orElseGet(() -> {
-                    User newUser = new User();
-                    newUser.setName(dto.getAuthorName());
-                    return userRepository.save(newUser);
-                });
+//        User author = userRepository.findByName(dto.getAuthorName())
+//                .orElseGet(() -> {
+//                    User newUser = new User();
+//                    newUser.setName(dto.getAuthorName());
+//                    return userRepository.save(newUser);
+//                });
+        User author;
+        if (dto.getAuthorUsername() != null) {
+            author = userRepository.findByUsername(dto.getAuthorUsername())
+                    .orElseThrow(() -> new RuntimeException(
+                            "Logged-in user not found: " + dto.getAuthorUsername()));
+        } else {
+            // legacy path — kept so existing tests don't break
+            author = userRepository.findByName(dto.getAuthorName())
+                    .orElseGet(() -> {
+                        User newUser = new User();
+                        newUser.setName(dto.getAuthorName());
+                        return userRepository.save(newUser);
+                    });
+        }
         post.setAuthor(author);
         post.setPublishedAt(LocalDateTime.now());
 
         postRepository.save(post);
         tagService.attachTags(post, dto.getTags());
+    }
+    @Override
+    public String getUsernameByPostId(Long postId) {
+        Post post = postRepository.findById(postId)
+                .orElseThrow(() -> new RuntimeException("Post not found: " + postId));
+        User author = post.getAuthor();
+        // username may be null for seed data created before security was added
+        return author.getUsername() != null ? author.getUsername() : author.getName();
     }
     @Override
     public List<PostResponseDto> getAllPosts() {
@@ -117,21 +139,40 @@ public class PostServiceImpl implements PostService {
         return dto;
     }
     @Override
-    public void updatePost(Long postId, PostUpdateDto dto) {
-
+    public void updatePost(Long postId, PostUpdateDto dto, String currentUsername, boolean isAdmin) {
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new RuntimeException("Post not found"));
+
+        String postOwner = post.getAuthor() != null ? post.getAuthor().getUsername() : null;
+        if (!isAdmin && !currentUsername.equals(postOwner)) {
+            throw new RuntimeException("You can only edit your own posts");
+        }
+
         post.setTitle(dto.getTitle());
         post.setExcerpt(dto.getExcerpt());
         post.setContent(dto.getContent());
         tagService.updateTags(post, dto.getTags());
-        //post.setPublishedAt(dto.getPublishedAt());
+
+        // Admin can reassign author
+        if (isAdmin && dto.getAuthorUsername() != null && !dto.getAuthorUsername().isBlank()) {
+            User newAuthor = userRepository.findByUsername(dto.getAuthorUsername())
+                    .orElseThrow(() -> new RuntimeException("Author not found: " + dto.getAuthorUsername()));
+            post.setAuthor(newAuthor);
+        }
+
         postRepository.save(post);
-
-
     }
+
     @Override
-    public void deletePost(Long postId) {
+    public void deletePost(Long postId, String currentUsername, boolean isAdmin) {
+        Post post = postRepository.findById(postId)
+                .orElseThrow(() -> new RuntimeException("Post not found"));
+
+        String postOwner = post.getAuthor() != null ? post.getAuthor().getUsername() : null;
+        if (!isAdmin && !currentUsername.equals(postOwner)) {
+            throw new RuntimeException("You can only delete your own posts");
+        }
+
         postRepository.deleteById(postId);
     }
     @Override
@@ -152,10 +193,11 @@ public class PostServiceImpl implements PostService {
 
     public List<AuthorDto> getAllAuthors() {
 
-        return userRepository.findAll().stream().map( user -> {
+        return userRepository.findAll().stream().map(user -> {
             AuthorDto authorDto = new AuthorDto();
             authorDto.setId(user.getId());
             authorDto.setName(user.getName());
+            authorDto.setUsername(user.getUsername());
             return authorDto;
         }).toList();
     }

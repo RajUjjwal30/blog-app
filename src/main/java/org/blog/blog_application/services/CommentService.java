@@ -9,4 +9,7 @@ public interface CommentService {
 
     List<CommentDto> getCommentsByPostId(Long postId);
 
+    void deleteComment(Long commentId, String currentUsername, boolean isAdmin);
+
+    void updateComment(Long commentId, String newContent, String currentUsername, boolean isAdmin);
 }

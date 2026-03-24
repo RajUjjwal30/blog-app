@@ -21,14 +21,16 @@ public interface PostService {
 
     PostUpdateDto getPostForUpdate(Long postId);
 
-    void updatePost(Long postId, PostUpdateDto dto);
+    void updatePost(Long postId, PostUpdateDto dto, String currentUsername, boolean isAdmin);
 
-    void deletePost(Long postId);
+    void deletePost(Long postId, String currentUsername, boolean isAdmin);
 
     List<PostResponseDto> getPostsByAuthorName(String authorName);
 
     List<String> getAllAuthorNames();
 
     public List<AuthorDto> getAllAuthors();
+
+    String getUsernameByPostId(Long postId);
 
 }

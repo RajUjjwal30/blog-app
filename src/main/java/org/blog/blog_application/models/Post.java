@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -17,13 +18,15 @@ public class Post extends BaseModel{
     private String excerpt;
     @Column(nullable = false,columnDefinition = "LONGTEXT")
     private String content;
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "user_id")
     private User author;
     private LocalDateTime publishedAt;
     private boolean isPublished;
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL)
     private Set<PostTag> postTags = new HashSet<>();
+    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL)
+    private List<Comment> comment = new ArrayList<>();
 
 
     @PrePersist
@@ -32,7 +35,7 @@ public class Post extends BaseModel{
     }
     @PreUpdate
     public void preUpdate() {
-        this.publishedAt = LocalDateTime.now();
+        // publishedAt is set once on creation and never changed
     }
 
 }

@@ -9,6 +9,8 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+
 @Getter
 @Setter
 @MappedSuperclass
@@ -16,11 +18,11 @@ import java.time.LocalDate;
 public abstract class BaseModel {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id(pk)")
+    @Column(name = "id")
     private Long id;
     @CreatedDate
     @Column(updatable = false)
-    private LocalDate createdAt;
+    private LocalDateTime createdAt;
     @LastModifiedDate
-    private LocalDate updatedAt;
+    private LocalDateTime updatedAt;
 }

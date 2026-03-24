@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head th:fragment="header">
     <meta charset="UTF-8">
     <title>All Posts</title>
@@ -9,7 +9,7 @@
           crossorigin="anonymous">
 </head>
 <body>
-<nav class="navbar navbar-expand-lg bg-body-tertiary style=background-color: #e3f2fd;" data-bs-theme="light" th:fragment="navbar">
+<nav class="navbar navbar-expand-lg bg-body-tertiary" style="background-color: #e3f2fd;" data-bs-theme="light" th:fragment="navbar">
     <div class="container-fluid">
         <a class="navbar-brand" href="#">Thoughts</a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
@@ -20,35 +20,54 @@
                 <li class="nav-item">
                     <a class="nav-link active" aria-current="page" th:href="@{/blog/posts}">Posts</a>
                 </li>
-                <!--        <li class="nav-item dropdown">-->
-                <!--          <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">-->
-                <!--            Filter-->
-                <!--          </a>-->
-                <!--          <ul class="dropdown-menu">-->
-                <!--            <li><a class="dropdown-item" href="#">Author</a></li>-->
-                <!--            <li><a class="dropdown-item" href="#">Another action</a></li>-->
-                <!--            <li><hr class="dropdown-divider"></li>-->
-                <!--            <li><a class="dropdown-item" href="#">Something else here</a></li>-->
-                <!--          </ul>-->
-                <!--        </li>-->
-                <button type="button" class="btn btn-success">
-                    <a style="color: white" th:href="@{/blog/posts/create}">Create Post</a></button>
-
+                <li class="nav-item" sec:authorize="hasAnyRole('AUTHOR','ADMIN')">
+                    <button type="button" class="btn btn-success">
+                        <a style="color: white" th:href="@{/blog/posts/create}">Create Post</a></button>
+                </li>
             </ul>
 
-        <form th:action="@{/blog/posts}" method="get" class="d-flex">
+            <!-- Search form (standalone, no nesting) -->
+            <form th:action="@{/blog/posts}" method="get" class="d-flex me-2">
+                <input type="text"
+                       name="search"
+                       class="form-control"
+                       placeholder="Search posts..."
+                       th:value="${search}" />
+                <button type="submit" class="btn btn-success ms-2">
+                    Search
+                </button>
+            </form>
 
-            <input type="text"
-                   name="search"
-                   class="form-control"
-                   placeholder="Search posts..."
-                   th:value="${search}" />
+            <!-- User info + logout OR login/register links (outside the search form) -->
+            <ul class="navbar-nav">
 
+                <!-- Logged in -->
+                <li class="nav-item" sec:authorize="isAuthenticated()">
+          <span class="navbar-text me-2">
+            Hello, <strong sec:authentication="name"></strong>
+            <span sec:authorize="hasRole('ADMIN')"
+                  class="badge bg-danger ms-1">Admin</span>
+            <span sec:authorize="hasRole('AUTHOR')"
+                  class="badge bg-primary ms-1">Author</span>
+          </span>
+                </li>
+                <li class="nav-item" sec:authorize="isAuthenticated()">
+                    <form th:action="@{/logout}" method="post" class="d-inline">
+                        <button class="btn btn-outline-dark btn-sm">Logout</button>
+                    </form>
+                </li>
 
-            <button type="submit" class="btn btn-success ms-2">
-                Search
-            </button>
-        </form>
+                <!-- Not logged in -->
+                <li class="nav-item" sec:authorize="!isAuthenticated()">
+                    <a class="btn btn-outline-dark btn-sm me-2"
+                       th:href="@{/login}">Login</a>
+                </li>
+                <li class="nav-item" sec:authorize="!isAuthenticated()">
+                    <a class="btn btn-dark btn-sm"
+                       th:href="@{/register}">Register</a>
+                </li>
+            </ul>
+
         </div>
     </div>
 </nav>
