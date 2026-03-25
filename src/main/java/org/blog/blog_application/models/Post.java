@@ -16,7 +16,7 @@ public class Post extends BaseModel{
     @Column(nullable = false)
     private String title;
     private String excerpt;
-    @Column(nullable = false,columnDefinition = "LONGTEXT")
+    @Column(nullable = false,columnDefinition = "TEXT")
     private String content;
     @ManyToOne
     @JoinColumn(name = "user_id")
